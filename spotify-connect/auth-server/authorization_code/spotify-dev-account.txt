@@ -1,0 +1,6 @@
+https://developer.spotify.com/dashboard/login
+DFY Account:
+Client ID: ed2d4bbb071e479486b956e0749346f8
+Client Secret: 1261a30a6827432e8ddba467b29d17ef
+Redirect URI: http://localhost:8888/callback
+
