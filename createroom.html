@@ -32,19 +32,6 @@
     </style>
     <!-- Custom styles for this template -->
     <link href="css/cover.css" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/5.10.0/firebase.js"></script>
-<script>
-  // Initialize Firebase
-  var config = {
-    apiKey: "AIzaSyCsEe-Gzz19ofzvAudTTCL9eb592PbEKns",
-    authDomain: "djfy-236322.firebaseapp.com",
-    databaseURL: "https://djfy-236322.firebaseio.com",
-    projectId: "djfy-236322",
-    storageBucket: "djfy-236322.appspot.com",
-    messagingSenderId: "182508228954"
-  };
-  firebase.initializeApp(config);
-</script>
 
     <script type="text/javascript">
       function makeid(length) {
@@ -69,33 +56,7 @@
         return code;
       }
 
-      function savedata() {
-        // Initialize Cloud Firestore through Firebase
-       /*firebase.initializeApp({
-         apiKey: 'AIzaSyCsEe-Gzz19ofzvAudTTCL9eb592PbEKns',
-        authDomain: '### FIREBASE AUTH DOMAIN ###',
-         projectId: 'djfy-236322'
-        });*/
-
-        console.log("test2")
-        const db = firebase.firestore();
-        var x = document.getElementById("form1");
-        var name = x.elements[0].value;
-        var roomsRef = db.collection("roomss");
-        db.collection("rooms").doc("key").set({name: "test"})
-
-        db.collection("cities").doc("LA").set({
-            name: "Los Angeles",
-            state: "CA",
-            country: "USA"
-        })
-        .then(function() {
-            console.log("Document successfully written!");
-        })
-        .catch(function(error) {
-            console.error("Error writing document: ", error);
-        });
-      }
+      
 
     </script>
   </head>
@@ -141,5 +102,52 @@
     </div>
   </footer>-->
 </div>
+  <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase.js"></script>
+
+  <script>
+      // TODO: Replace the following with your app's Firebase project configuration
+      var firebaseConfig = {
+    apiKey: "AIzaSyCsEe-Gzz19ofzvAudTTCL9eb592PbEKns",
+    authDomain: "djfy-236322.firebaseapp.com",
+    databaseURL: "https://djfy-236322.firebaseio.com",
+    projectId: "djfy-236322",
+    storageBucket: "djfy-236322.appspot.com",
+    messagingSenderId: "182508228954"
+  };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+  </script>
+
+  <script type="text/javascript">
+    function savedata() {
+        // Initialize Cloud Firestore through Firebase
+       /*firebase.initializeApp({
+         apiKey: 'AIzaSyCsEe-Gzz19ofzvAudTTCL9eb592PbEKns',
+        authDomain: '### FIREBASE AUTH DOMAIN ###',
+         projectId: 'djfy-236322'
+        });*/
+
+        console.log("test2")
+        const db = firebase.firestore();
+        var x = document.getElementById("form1");
+        var name = x.elements[0].value;
+        var roomsRef = db.collection("roomss");
+        db.collection("rooms").doc("key").set({name: "test"})
+
+        db.collection("cities").doc("LA").set({
+            name: "Los Angeles",
+            state: "CA",
+            country: "USA"
+        })
+        .then(function() {
+            console.log("Document successfully written!");
+        })
+        .catch(function(error) {
+            console.error("Error writing document: ", error);
+        });
+      }
+
+  </script>
+
 </body>
 </html>
