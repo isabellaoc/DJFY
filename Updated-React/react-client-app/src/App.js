@@ -50,6 +50,10 @@ class App extends Component {
             })
     }
 
+    joinRoom() {
+        // 
+    }
+
     // Display our data
     render() {
         return (
@@ -62,17 +66,49 @@ class App extends Component {
                 <img src={this.state.spotifyAccount.accountPic} style={{ height: 100 }}/>
                 <br /> <br />
             </div>
-            <p class="lead">
-                <a href="http://localhost:8888" class="btn btn-sm btn-secondary">CONNECT SPOTIFY</a>
-            </p>
+
+            {/* Show button to check spotify account */}
             {
                 this.state.loggedIn &&
-                <button onClick={() => this.getConnectedAccount()}>
-                    Check Account
+                <button class="btn btn-sm btn-primary" onClick={() => this.getConnectedAccount()}>
+                    ShowAccount
                 </button>
             }
+
+            <br /> <br /> <br />
+            <p>
+                Connect to Spotify &nbsp;
+                <a href="http://localhost:8888" class="btn btn-lg btn-secondary">Connect</a>
+
+                &nbsp;&nbsp;&nbsp;&nbsp;{/* Adding space in between the two buttons */}
+
+                Join Room &nbsp;
+                <button class="btn btn-lg btn-secondary" onClick={() => this.joinRoom()}>Join</button>
+            </p>
+
+            <Room> </Room>
+
           </div>
         );
+    }
+}
+
+class Room extends Component {
+    render() {
+      return (
+        <div className="Room">
+        <h2>Playlist</h2>
+
+        <ul>
+            Search: <input type = "text"/>
+            <br/> <br/>
+
+            <li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button> Song 1</li>
+            <li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button> Song 2</li>
+            <li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button> Song 3</li>
+        </ul>
+      </div>
+      );
     }
 }
 
