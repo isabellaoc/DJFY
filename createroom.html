@@ -58,7 +58,7 @@
       function savedata() {
         var x = document.getElementById("form1");
         var name = x.elements[0].value;
-        var roomsRef = db.collection("rooms");
+        var roomsRef = db.collection("roomss");
         db.collection("rooms").doc("key").set({name: "test"})
       }
 
