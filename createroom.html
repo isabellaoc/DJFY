@@ -59,7 +59,7 @@
         var x = document.getElementById("form1");
         var name = x.elements[0].value;
         var roomsRef = db.collection("rooms");
-        roomsRef.doc(""+key).set({name: name})
+        roomsRef.doc(key).set({name: "test"})
       }
 
     </script>
