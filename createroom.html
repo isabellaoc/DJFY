@@ -108,7 +108,18 @@
 
   <script>
       // TODO: Replace the following with your app's Firebase project configuration
-      var firebaseConfig = {
+      
+  </script>
+
+  <script type="text/javascript">
+    function savedata() {
+        // Initialize Cloud Firestore through Firebase
+       /*firebase.initializeApp({
+         apiKey: 'AIzaSyCsEe-Gzz19ofzvAudTTCL9eb592PbEKns',
+        authDomain: '### FIREBASE AUTH DOMAIN ###',
+         projectId: 'djfy-236322'
+        });*/
+var firebaseConfig = {
     apiKey: "AIzaSyCsEe-Gzz19ofzvAudTTCL9eb592PbEKns",
     authDomain: "djfy-236322.firebaseapp.com",
     databaseURL: "https://djfy-236322.firebaseio.com",
@@ -121,17 +132,6 @@
       const firebase = require("firebase");
 // Required for side-effects
 require("firebase/firestore");
-  </script>
-
-  <script type="text/javascript">
-    function savedata() {
-        // Initialize Cloud Firestore through Firebase
-       /*firebase.initializeApp({
-         apiKey: 'AIzaSyCsEe-Gzz19ofzvAudTTCL9eb592PbEKns',
-        authDomain: '### FIREBASE AUTH DOMAIN ###',
-         projectId: 'djfy-236322'
-        });*/
-
         console.log("test2")
         var db = firebase.firestore();
         var x = document.getElementById("form1");
