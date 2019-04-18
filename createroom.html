@@ -32,6 +32,20 @@
     </style>
     <!-- Custom styles for this template -->
     <link href="css/cover.css" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/5.10.0/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyCsEe-Gzz19ofzvAudTTCL9eb592PbEKns",
+    authDomain: "djfy-236322.firebaseapp.com",
+    databaseURL: "https://djfy-236322.firebaseio.com",
+    projectId: "djfy-236322",
+    storageBucket: "djfy-236322.appspot.com",
+    messagingSenderId: "182508228954"
+  };
+  firebase.initializeApp(config);
+</script>
+
     <script type="text/javascript">
       function makeid(length) {
        var text = "";
@@ -58,9 +72,9 @@
       function savedata() {
         // Initialize Cloud Firestore through Firebase
        /*firebase.initializeApp({
-         apiKey: '### FIREBASE API KEY ###',
+         apiKey: 'AIzaSyCsEe-Gzz19ofzvAudTTCL9eb592PbEKns',
         authDomain: '### FIREBASE AUTH DOMAIN ###',
-         projectId: '### CLOUD FIRESTORE PROJECT ID ###'
+         projectId: 'djfy-236322'
         });*/
 
         console.log("test2")
