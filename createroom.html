@@ -60,6 +60,18 @@
         var name = x.elements[0].value;
         var roomsRef = db.collection("roomss");
         db.collection("rooms").doc("key").set({name: "test"})
+
+        db.collection("cities").doc("LA").set({
+            name: "Los Angeles",
+            state: "CA",
+            country: "USA"
+        })
+        .then(function() {
+            console.log("Document successfully written!");
+        })
+        .catch(function(error) {
+            console.error("Error writing document: ", error);
+        });
       }
 
     </script>
