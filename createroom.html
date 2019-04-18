@@ -48,7 +48,7 @@
 
       function createlink() { 
         var code = makeid(4);
-      
+        console.log("test")
         var url = "playlist.html?x=" + code;
         var element = document.getElementById('YOUR_ID');
         element.setAttribute("href",url)
@@ -56,6 +56,7 @@
       }
 
       function savedata() {
+        console.log("test2")
         var x = document.getElementById("form1");
         var name = x.elements[0].value;
         var roomsRef = db.collection("roomss");
