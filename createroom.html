@@ -56,7 +56,15 @@
       }
 
       function savedata() {
+        // Initialize Cloud Firestore through Firebase
+       /*firebase.initializeApp({
+         apiKey: '### FIREBASE API KEY ###',
+        authDomain: '### FIREBASE AUTH DOMAIN ###',
+         projectId: '### CLOUD FIRESTORE PROJECT ID ###'
+        });*/
+
         console.log("test2")
+        const db = firebase.firestore();
         var x = document.getElementById("form1");
         var name = x.elements[0].value;
         var roomsRef = db.collection("roomss");
