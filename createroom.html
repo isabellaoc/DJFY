@@ -59,6 +59,9 @@
       
 
     </script>
+      <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/5.9.3/firebase-firestore.js"></script>
   </head>
   <body class="text-center">
     <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
@@ -87,31 +90,7 @@
       <br>
     </form> 
     <br>
-    
-    <p class="lead">
-      <a id="YOUR_ID" href="#" onclick="savedata()" class="btn btn-lg btn-secondary">CREATE ROOM</a>
-    </p>
-    <script> var key = createlink();
-
-    </script>
-  </main>
-
-  <!--<footer class="mastfoot mt-auto">
-    <div class="inner">
-      <p>Cover template for <a href="https://getbootstrap.com/">Bootstrap</a>, by <a href="https://twitter.com/mdo">@mdo</a>.</p>
-    </div>
-  </footer>-->
-</div>
-  <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/5.9.3/firebase-firestore.js"></script>
-
-  <script>
-      // TODO: Replace the following with your app's Firebase project configuration
-      
-  </script>
-
-  <script type="text/javascript">
+    <script type="text/javascript">
     function savedata() {
         // Initialize Cloud Firestore through Firebase
        /*firebase.initializeApp({
@@ -167,6 +146,28 @@ db.collection("users").add({
 });
 
   </script>
+    <p class="lead">
+      <a id="YOUR_ID" href="#" onclick="savedata()" class="btn btn-lg btn-secondary">CREATE ROOM</a>
+    </p>
+    <script> var key = createlink();
+
+    </script>
+  </main>
+
+  <!--<footer class="mastfoot mt-auto">
+    <div class="inner">
+      <p>Cover template for <a href="https://getbootstrap.com/">Bootstrap</a>, by <a href="https://twitter.com/mdo">@mdo</a>.</p>
+    </div>
+  </footer>-->
+</div>
+
+
+  <script>
+      // TODO: Replace the following with your app's Firebase project configuration
+      
+  </script>
+
+  
 
 </body>
 </html>
