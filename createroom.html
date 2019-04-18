@@ -32,6 +32,37 @@
     </style>
     <!-- Custom styles for this template -->
     <link href="css/cover.css" rel="stylesheet">
+    <script type="text/javascript">
+      function makeid(length) {
+       var text = "";
+       var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        for (var i = 0; i < length; i++)
+          text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
+      }
+
+      //console.log(makeid(5));
+      //var link = document.getElementById("id_of_anchor");
+
+      function createlink() { 
+        var code = makeid(4);
+      
+        var url = "playlist.html?x=" + code;
+        var element = document.getElementById('YOUR_ID');
+        element.setAttribute("href",url)
+        return code;
+      }
+
+      function savedata() {
+        var x = document.getElementById("form1");
+        var name = x.elements[0].value;
+        var roomsRef = db.collection("rooms");
+        roomsRef.doc(""+key).set({name: name})
+      }
+
+    </script>
   </head>
   <body class="text-center">
     <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
@@ -52,7 +83,7 @@
     <p class="lead">
       <a href="createroom.html" class="btn btn-lg btn-secondary">CONNECT SPOTIFY</a> <!--THIS SHOULD UPDATE FROM SPOTIFY API. probably some sort of widget inlay that shows profile pic and stuff-->
     </p>
-    <form>
+    <form id="form1">
       <p class="lead">
         <a href="createroom.html">NAME PLAYLIST:</a>
       </p>
@@ -60,9 +91,13 @@
       <br>
     </form> 
     <br>
+    
     <p class="lead">
-      <a href="playlist.html" class="btn btn-lg btn-secondary">CREATE ROOM</a>
+      <a id="YOUR_ID" href="#" class="btn btn-lg btn-secondary">CREATE ROOM</a>
     </p>
+    <script> var key = createlink();
+
+    </script>
   </main>
 
   <!--<footer class="mastfoot mt-auto">
