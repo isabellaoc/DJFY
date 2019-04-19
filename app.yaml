@@ -5,8 +5,8 @@ runtime: nodejs
 
 handlers:
 - url: /
-  static_files: build/index.html
-  upload: build/index.html
+  static_files: build-2/build/index.html
+  upload: build-2/build/index.html
 
 - url: /
-  static_dir: build
+  static_dir: build-2/build
