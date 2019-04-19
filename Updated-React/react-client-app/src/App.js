@@ -77,7 +77,11 @@ class App extends Component {
             })
     }
 	
-	
+    joinRoom() {
+      var roomCode = Math.random() * 9999999999;
+  }
+
+    
 	createNewPlaylist(id)	{
 		spotifyApi.createPlaylist(id)
 			.then((response) => {
@@ -168,7 +172,7 @@ class App extends Component {
             <form onSubmit={this.handleSubmit}>
               <label>
                 Search:
-                <textarea  type = 'text' value={this.state.search} onChange={this.handleChange} />
+                <input type = "text"/>
               </label>
               <input type="submit" value="Search" />
             </form>
