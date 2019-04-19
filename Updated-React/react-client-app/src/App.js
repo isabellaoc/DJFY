@@ -6,7 +6,7 @@ const spotifyApi = new SpotifyWebApi();
 
 var tracks = ["Song 1", "Song 2", "Song 3", "Song 4", "Song 5"];
 var listItems = tracks.map((tracks) =>
-  <li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button>{tracks}</li>
+  <li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}} /*onClick={() => this.removeTracks()*/>-</button>{tracks}</li>
 );
 
 class App extends Component {
@@ -77,10 +77,6 @@ class App extends Component {
             })
     }
 	
-	/*createNewPlaylist()
-    joinRoom() {
-        // 
-    }*/
 	
 	createNewPlaylist(id)	{
 		spotifyApi.createPlaylist(id)
@@ -94,7 +90,7 @@ class App extends Component {
 				});
 			})
 	}
-	
+
 	search() {
 		spotifyApi.search()
 		.then((response) => {
@@ -131,6 +127,7 @@ class App extends Component {
 			})
 	}
 
+  
     // Display our data
     render() {
         return (
@@ -164,13 +161,10 @@ class App extends Component {
             </p>
 
 
-            <button  onClick={() => this.createNewPlaylist()}>Create Playlist</button>
-
-            <h2>{this.state.playlistName}</h2>
-            <h3>{this.state.search}</h3>
-
             <ul align = "left">
-            <h2>{this.state.playlistName}</h2> 
+            <h2>{this.state.playlistName}</h2>
+
+
             <form onSubmit={this.handleSubmit}>
               <label>
                 Search:
@@ -182,7 +176,7 @@ class App extends Component {
                   <br/> <br/>
                   {listItems}
             </ul> 
-
+            
           </div>
         );
     }
