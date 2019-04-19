@@ -21,7 +21,7 @@ class App extends Component {
       }
       this.state = {
           loggedIn: token ? true : false,
-          spotifyAccount: {accountName: 'Not Logged In', accountPic: ''},
+          spotifyAccount: {accountName: 'Not Logged In', accountPic: '', Id: ''},
           
           playlistName:'Playlist Name',
           search: '',
@@ -29,6 +29,14 @@ class App extends Component {
           
         this.handleChange = this.handleChange.bind(this);
         this.handleSearch = this.handleSearch.bind(this);
+
+        this.getHashParams = this.getHashParams.bind(this);
+        this.getConnectedAccount = this.getConnectedAccount.bind(this);
+        this.createNewPlaylist = this.createNewPlaylist.bind(this);
+        this.search = this.search.bind(this);
+        this.getTrack = this.getTrack.bind(this);
+        this.addTracks = this.addTracks.bind(this);
+        this.removeTracks = this.removeTracks.bind(this);
       }
     
 
@@ -41,14 +49,6 @@ class App extends Component {
         event.preventDefault();
     }
     
-    changePlaylistName = (event) =>  {
-        this.setState({
-        playlistName: event.target.value 
-          })
-    }
-    // Using code from authorization_code/public/index.html
-    // (https://github.com/spotify/web-api-auth-examples)
-    // Extracts token params from hash string of the URL into an object with key-value pairs.
     getHashParams() {
       var hashParams = {};
       var e, r = /([^&;=]+)=?([^&;]*)/g,
@@ -70,15 +70,66 @@ class App extends Component {
                 this.setState( {
                     spotifyAccount: {
                         accountName: response.display_name,
-                        accountPic: response.images[0].url
+                        accountPic: response.images[0].url,
+						Id: response.id
                     }
                 });
             })
     }
-
+	
+	/*createNewPlaylist()
     joinRoom() {
         // 
-    }
+    }*/
+	
+	createNewPlaylist(id)	{
+		spotifyApi.createPlaylist(id)
+			.then((response) => {
+				this.setState( {
+					newPlaylist: {
+						name: response.name,
+						snId: response.snapshot_id,
+						tracks: response.tracks.items
+					}
+				});
+			})
+	}
+	
+	search() {
+		spotifyApi.search()
+		.then((response) => {
+			this.setState( {
+				results: response.track.items
+			});
+		})
+	}
+	
+	getTrack() {
+		spotifyApi.getTrack()
+			.then((response) => {
+				this.setState( {
+					newTrack: response.id
+				});				
+			})
+	}
+	
+	addTracks(snId) {
+		spotifyApi.addTracksToPlaylist(snId)
+			.then((response) => {
+				this.setState( {
+					snId: response.snapshot_id
+				});
+			})
+	}
+	
+	removeTracks(snId) {
+		spotifyApi.removeTracksFromPlaylistWithSnapshotId(snId)
+			.then((response) => {
+				this.setState( {
+					snId: response.snapshot_id
+				});
+			})
+	}
 
     // Display our data
     render() {
@@ -111,6 +162,9 @@ class App extends Component {
                 Join Room &nbsp;
                 <button class="btn btn-lg btn-secondary" onClick={() => this.joinRoom()}>Join</button>
             </p>
+
+
+            <button  onClick={() => this.createNewPlaylist()}>Create Playlist</button>
 
             <h2>{this.state.playlistName}</h2>
             <h3>{this.state.search}</h3>
