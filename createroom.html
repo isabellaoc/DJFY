@@ -107,10 +107,20 @@ var firebaseConfig = {
     messagingSenderId: "182508228954"
   };
       // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
+     /* firebase.initializeApp(firebaseConfig);
       const firebase = require("firebase");
 // Required for side-effects
-require("firebase/firestore");
+require("firebase/firestore");*/
+
+// Initialize Firebase with a "default" Firebase project
+var defaultProject = firebase.initializeApp(firebaseConfig);
+
+console.log(defaultProject.name);  // "[DEFAULT]"
+
+// Option 1: Access Firebase services via the defaultProject variable
+var defaultStorage = defaultProject.storage();
+var defaultDatabase = defaultProject.database();
+
         console.log("test2")
         var db = firebase.firestore();
         var x = document.getElementById("form1");
