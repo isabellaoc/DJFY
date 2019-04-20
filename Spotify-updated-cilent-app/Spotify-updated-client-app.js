@@ -34,14 +34,6 @@ class App extends Component {
           
         this.handleChange = this.handleChange.bind(this);
         this.handleSearch = this.handleSearch.bind(this);
-	    
-	this.getHashParams = this.getHashParams.bind(this);
-        this.getConnectedAccount = this.getConnectedAccount.bind(this);
-        this.createNewPlaylist = this.createNewPlaylist.bind(this);
-        this.search = this.search.bind(this);
-        this.getTrack = this.getTrack.bind(this);
-        this.addTracks = this.addTracks.bind(this);
-        this.removeTracks = this.removeTracks.bind(this);
       }
     
 
