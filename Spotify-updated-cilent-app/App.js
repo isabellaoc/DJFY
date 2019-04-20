@@ -151,6 +151,7 @@ class App extends Component {
     else {
         //get room code input
         //enter room
+        alert("Sign in to Spotify");
         var x = document.getElementById("createroom");
         var playlistname = "";
         playlistname = x.elements[0].value;
