@@ -255,7 +255,7 @@ class App extends Component {
                           <br/>
                     </form> 
                     <p class="lead">
-                          <a id="YOUR_ID" href="#" onClick={() => this.createRoom()} class="btn btn-lg btn-secondary">CREATE ROOM</a>
+                          <a id="YOUR_ID" /*href="#"*/ onClick={() => this.createRoom()} class="btn btn-lg btn-secondary">CREATE ROOM</a>
                     </p>
                   </div>
                 </div>
