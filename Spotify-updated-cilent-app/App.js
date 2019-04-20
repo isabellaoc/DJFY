@@ -109,6 +109,46 @@ class App extends Component {
           console.log("code: " + text);
     	}
   }
+  makeid(length) {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+     for (var i = 0; i < length; i++)
+       text += possible.charAt(Math.floor(Math.random() * possible.length));
+     return text;
+   }
+
+  createRoom() {
+    if (this.state.loggedIn) {
+        //enters playlist name
+        this.setState( {
+          roomCode: Math.random() * 99999999,
+          playlistName: 'Name that is entered'
+        })
+        this.createNewPlaylist();
+        //enter room
+    } 
+    else {
+        //get room code input
+        //enter room
+        var x = document.getElementById("createroom");
+        var playlistname = "";
+        playlistname = x.elements[0].value;
+        var roomcode = this.makeid(4)
+        console.log("playlistname: " + playlistname);
+        console.log("room code: " + roomcode)
+    }
+}
+
+/*createlink() { 
+  var code = makeid(4);
+  console.log("test")
+  var url = "playlist.html?x=" + code;
+  var element = document.getElementById('YOUR_ID');
+  element.setAttribute("href",url)
+  return code;
+}*/
+
+
 	
 	createNewPlaylist(id)	{
 		spotifyApi.createPlaylist(id)
@@ -190,9 +230,21 @@ class App extends Component {
             }
 
             <br /> <br /> <br />
-            <p>
-                Connect to Spotify &nbsp;
-                <a href="http://localhost:8888" class="btn btn-lg btn-secondary">Connect</a>
+              <div>
+                <p>Connect to Spotify &nbsp;</p>
+                <a href="http://localhost:8888" class="btn btn-lg btn-secondary">Connect</a></div>
+                <form id="createroom">
+                      <p class="lead">
+                        <a>NAME PLAYLIST:</a>
+                      </p>
+                      <input type="text" name="playlistname"/>
+                      <br/>
+                </form> 
+                <p class="lead">
+                      <a id="YOUR_ID" href="#" onClick={() => this.createRoom()} class="btn btn-lg btn-secondary">CREATE ROOM</a>
+                </p>
+
+
 
                 &nbsp;&nbsp;&nbsp;&nbsp;{/* Adding space in between the two buttons */}
                 <form id="joinroom"> 
@@ -204,7 +256,7 @@ class App extends Component {
                 </form>
                 Join Room &nbsp;
                 <button class="btn btn-lg btn-secondary" onClick={() => this.joinRoom()}>Join</button>
-            </p>
+            
 
             <h2>{this.state.playlistName} - {this.state.roomCode}</h2>
 
