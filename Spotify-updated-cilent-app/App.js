@@ -91,33 +91,23 @@ class App extends Component {
     }
 
     joinRoom() {
-    	if (this.state.loggedIn) {
-      		//enters playlist name
-      		/*this.setState( {
-        		roomCode: Math.random() * 99999999,
-        		playlistName: 'Name that is entered'
-      		})
-          this.createNewPlaylist();*/
+
           var x = document.getElementById("joinroom");
           var text = "";
           text = x.elements[0].value;
           console.log("code: " + text);
+          if(true/* inDatabase(this.state.value.toUpperCase()*/){
+            alert(this.state.value.toUpperCase() + " is an invalid room code.")
+          }
+          else{
+            //
+          }
           //check if its a legal inputted code (4 capital characters)
           //check if the database has the inputted code
           //if the database has that code, display the corresponding playlist
           //if it doesnt then error out
           
           //enter room
-          
-    	} 
-    	else { //shouldnt need the if else statement
-      		//get room code input
-          //enter room
-          var x = document.getElementById("joinroom");
-          var text = "";
-          text = x.elements[0].value;
-          console.log("code: " + text);
-    	}
   }
 
   makeid(length) {
@@ -268,13 +258,15 @@ class App extends Component {
               <div class="col-sm-6">
                 <div class ="row">
                   <div class="col-lg-6">
+
                     <form id="joinroom"> 
                       <p class="lead">
                         <a>ROOM CODE:</a>
                       </p>
-                      <input type="text" name="roomcode"/>
+                      <input type="text" name="roomcode" onChange={this.handleChange} />
                       <br/>
                     </form>
+
                     Join Room
                     <button class="btn btn-lg btn-secondary" onClick={() => this.joinRoom()}>Join</button>
                   </div>
@@ -289,7 +281,7 @@ class App extends Component {
             <form onSubmit={this.handleSearch}>
               <label>
                 Search:
-                <input  type = 'text' value={this.state.search} onChange={this.handleChange} />
+                <input  type = 'text' onChange={this.handleChange} />
               </label>
               <input type="submit" value="Search" />
             </form>
