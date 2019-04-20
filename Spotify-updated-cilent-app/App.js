@@ -30,7 +30,7 @@ class App extends Component {
           
           playlistName:'',
           roomCode: '',
-          value: 'Unchanged'
+          value: '',
           };
           
           this.handleChange = this.handleChange.bind(this);
@@ -245,7 +245,7 @@ class App extends Component {
                           <p class="lead">
                             <a>NAME PLAYLIST:</a>
                           </p>
-                          <input  type = 'text' value={this.state.search} onChange={this.handleChange} />
+                          <input  type = 'text' onChange={this.handleChange} />
                           <br/>
                     </form> 
                     <p class="lead">
