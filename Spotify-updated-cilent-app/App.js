@@ -32,10 +32,11 @@ class App extends Component {
 	        roomCode: '00000000'
           };
           
-        this.handleChange = this.handleChange.bind(this);
+        this.handleChangeSearch = this.handleChangeSearch.bind(this);
+        this.handleChangePlaylist = this.handleChangePlaylist.bind(this);
         this.handleSearch = this.handleSearch.bind(this);
 	    
-	this.getHashParams = this.getHashParams.bind(this);
+	      this.getHashParams = this.getHashParams.bind(this);
         this.getConnectedAccount = this.getConnectedAccount.bind(this);
         this.createNewPlaylist = this.createNewPlaylist.bind(this);
         this.search = this.search.bind(this);
@@ -45,13 +46,18 @@ class App extends Component {
       }
     
 
-    handleChange(event) {
+    handleChangeSearch(event) {
         this.setState({search: event.target.value});
       }
+
+    handleChangePlaylist(event) {
+        this.setState({playlistName: event.target.value});
+      }
     
-    handleSearch(event) {
-        alert(this.search.value);
-        event.preventDefault();
+      handleSearch(event) {
+        //alert(this.state.search);
+        //event.preventDefault();
+        this.search(this.state.search);
     }
     
     changePlaylistName = (event) =>  {
@@ -94,8 +100,7 @@ class App extends Component {
     	if (this.state.loggedIn) {
       		//enters playlist name
       		this.setState( {
-        		roomCode: Math.random() * 99999999,
-        		playlistName: 'Name that is entered'
+        		roomCode: this.makeid(8),
       		})
       		this.createNewPlaylist();
       		//enter room
@@ -122,8 +127,7 @@ class App extends Component {
     if (this.state.loggedIn) {
         //enters playlist name
         this.setState( {
-          roomCode: Math.random() * 99999999,
-          playlistName: 'Name that is entered'
+          roomCode: this.makeid(8),
         })
         this.createNewPlaylist();
         //enter room
@@ -228,11 +232,11 @@ class App extends Component {
                   }
                     <p>Connect to Spotify &nbsp;</p>
                     <a href="http://localhost:8888" class="btn btn-lg btn-secondary">Connect</a>
-                    <form id="createroom">
+                    <form id="createroom" onSubmit={this.handleSubmit}>
                           <p class="lead">
                             <a>NAME PLAYLIST:</a>
                           </p>
-                          <input type="text" name="playlistname"/>
+                          <input  type = 'text' value={this.state.search} onChange={this.handleChangePlaylist} />
                           <br/>
                     </form> 
                     <p class="lead">
@@ -264,10 +268,10 @@ class App extends Component {
             
             <ul align = "left">
             <h2>{this.state.playlistName}</h2> 
-            <form onSubmit={this.handleSubmit}>
+            <form onSubmit={this.handleSearch}>
               <label>
                 Search:
-                <textarea  type = 'text' value={this.state.search} onChange={this.handleChange} />
+                <input  type = 'text' value={this.state.search} onChange={this.handleChangeSearch} />
               </label>
               <input type="submit" value="Search" />
             </form>
