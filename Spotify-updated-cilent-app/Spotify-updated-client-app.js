@@ -196,8 +196,7 @@ class App extends Component {
                 <button class="btn btn-lg btn-secondary" onClick={() => this.joinRoom()}>Join</button>
             </p>
 
-            <h2>{this.state.playlistName}</h2>
-            <h3>{this.state.search}</h3>
+            <h2>{this.state.playlistName} - {this.state.roomCode}</h2>
 
             <ul align = "left">
             <h2>{this.state.playlistName}</h2> 
