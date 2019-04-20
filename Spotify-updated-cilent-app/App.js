@@ -32,11 +32,10 @@ class App extends Component {
 	        roomCode: '00000000'
           };
           
-        this.handleChangeSearch = this.handleChangeSearch.bind(this);
-        this.handleChangePlaylist = this.handleChangePlaylist.bind(this);
+        this.handleChange = this.handleChange.bind(this);
         this.handleSearch = this.handleSearch.bind(this);
 	    
-	      this.getHashParams = this.getHashParams.bind(this);
+	this.getHashParams = this.getHashParams.bind(this);
         this.getConnectedAccount = this.getConnectedAccount.bind(this);
         this.createNewPlaylist = this.createNewPlaylist.bind(this);
         this.search = this.search.bind(this);
@@ -46,18 +45,13 @@ class App extends Component {
       }
     
 
-    handleChangeSearch(event) {
+    handleChange(event) {
         this.setState({search: event.target.value});
       }
-
-    handleChangePlaylist(event) {
-        this.setState({playlistName: event.target.value});
-      }
     
-      handleSearch(event) {
-        //alert(this.state.search);
-        //event.preventDefault();
-        this.search(this.state.search);
+    handleSearch(event) {
+        alert(this.search.value);
+        event.preventDefault();
     }
     
     changePlaylistName = (event) =>  {
@@ -99,13 +93,24 @@ class App extends Component {
     joinRoom() {
     	if (this.state.loggedIn) {
       		//enters playlist name
-      		this.setState( {
-        		roomCode: this.makeid(8),
+      		/*this.setState( {
+        		roomCode: Math.random() * 99999999,
+        		playlistName: 'Name that is entered'
       		})
-      		this.createNewPlaylist();
-      		//enter room
+          this.createNewPlaylist();*/
+          var x = document.getElementById("joinroom");
+          var text = "";
+          text = x.elements[0].value;
+          console.log("code: " + text);
+          //check if its a legal inputted code (4 capital characters)
+          //check if the database has the inputted code
+          //if the database has that code, display the corresponding playlist
+          //if it doesnt then error out
+          
+          //enter room
+          
     	} 
-    	else {
+    	else { //shouldnt need the if else statement
       		//get room code input
           //enter room
           var x = document.getElementById("joinroom");
@@ -114,7 +119,7 @@ class App extends Component {
           console.log("code: " + text);
     	}
   }
-  
+
   makeid(length) {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -127,10 +132,21 @@ class App extends Component {
     if (this.state.loggedIn) {
         //enters playlist name
         this.setState( {
-          roomCode: this.makeid(8),
+          roomCode: Math.random() * 99999999,
+          playlistName: 'Name that is entered'
         })
+        var x = document.getElementById("createroom");
+        var playlistname = "";
+        playlistname = x.elements[0].value;
+        var roomcode = this.makeid(4)
+        console.log("playlistname: " + playlistname);
+        console.log("room code: " + roomcode)
+        
         this.createNewPlaylist();
         //enter room
+        //Spotify calls: makeplaylist(playlistname)
+        //save to database the room code, spotify access token, playlist name
+        //display the playlist
     } 
     else {
         //get room code input
@@ -141,6 +157,8 @@ class App extends Component {
         var roomcode = this.makeid(4)
         console.log("playlistname: " + playlistname);
         console.log("room code: " + roomcode)
+        //this shouldn't create a code. I only have it here for testing purposes. 
+        //if its not logged in they shouldny be able to make a room
     }
 }
 
@@ -232,11 +250,11 @@ class App extends Component {
                   }
                     <p>Connect to Spotify &nbsp;</p>
                     <a href="http://localhost:8888" class="btn btn-lg btn-secondary">Connect</a>
-                    <form id="createroom" onSubmit={this.handleSubmit}>
+                    <form id="createroom">
                           <p class="lead">
                             <a>NAME PLAYLIST:</a>
                           </p>
-                          <input  type = 'text' value={this.state.search} onChange={this.handleChangePlaylist} />
+                          <input type="text" name="playlistname"/>
                           <br/>
                     </form> 
                     <p class="lead">
@@ -268,10 +286,10 @@ class App extends Component {
             
             <ul align = "left">
             <h2>{this.state.playlistName}</h2> 
-            <form onSubmit={this.handleSearch}>
+            <form onSubmit={this.handleSubmit}>
               <label>
                 Search:
-                <input  type = 'text' value={this.state.search} onChange={this.handleChangeSearch} />
+                <textarea  type = 'text' value={this.state.search} onChange={this.handleChange} />
               </label>
               <input type="submit" value="Search" />
             </form>
