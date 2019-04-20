@@ -91,8 +91,20 @@ class App extends Component {
     }
 
     joinRoom() {
-        // 
-    }
+    	if (this.state.loggedIn) {
+      		//enters playlist name
+      		this.setState( {
+        		roomCode: Math.random() * 99999999,
+        		playlistName: 'Name that is entered'
+      		})
+      		this.createNewPlaylist();
+      		//enter room
+    	} 
+    	else {
+      		//get room code input
+      		//enter room
+    	}
+  }
 	
 	createNewPlaylist(id)	{
 		spotifyApi.createPlaylist(id)
