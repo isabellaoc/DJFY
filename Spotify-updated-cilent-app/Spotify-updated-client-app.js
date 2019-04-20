@@ -29,7 +29,7 @@ class App extends Component {
           spotifyAccount: {accountName: 'Not Logged In', accountPic: ''},
           
           playlistName:'Playlist Name',
-          search: '',
+	  roomCode: '00000000';
           };
           
         this.handleChange = this.handleChange.bind(this);
