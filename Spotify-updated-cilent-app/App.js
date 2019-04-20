@@ -109,6 +109,7 @@ class App extends Component {
           console.log("code: " + text);
     	}
   }
+  
   makeid(length) {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -210,56 +211,57 @@ class App extends Component {
         return (
           <div className="App">
             <h1 class="cover-heading">DJFY</h1>
-            <div>
-                Spotify Account: {this.state.spotifyAccount.accountName}
-            </div>
-            <div>
-                <img  src={this.state.spotifyAccount.accountPic} style={{ height: 100 }}/>
-                <br /> <br />
-            </div>
+            <div class="row">
+              <div class="col-sm-6">
+                <div class ="row">
+                  <div class="col-lg-6">
+                  </div>
+                  <div class="col-lg-6">
+                    Spotify Account: {this.state.spotifyAccount.accountName}
+                    <img  src={this.state.spotifyAccount.accountPic} style={{ height: 100 }}/>
+                    <br /> <br /> {/* Show button to check spotify account */}
+                  {
+                    this.state.loggedIn &&
+                    <button class="btn btn-sm btn-primary" onClick={() => this.getConnectedAccount()}>
+                        ShowAccount
+                    </button>
+                  }
+                    <p>Connect to Spotify &nbsp;</p>
+                    <a href="http://localhost:8888" class="btn btn-lg btn-secondary">Connect</a>
+                    <form id="createroom">
+                          <p class="lead">
+                            <a>NAME PLAYLIST:</a>
+                          </p>
+                          <input type="text" name="playlistname"/>
+                          <br/>
+                    </form> 
+                    <p class="lead">
+                          <a id="YOUR_ID" href="#" onClick={() => this.createRoom()} class="btn btn-lg btn-secondary">CREATE ROOM</a>
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-            {/* Show button to check spotify account */}
-            {
-                this.state.loggedIn &&
-                <button class="btn btn-sm btn-primary" onClick={() => this.getConnectedAccount()}>
-                    ShowAccount
-                </button>
-				
-				
-				
-            }
-
-            <br /> <br /> <br />
-              <div>
-                <p>Connect to Spotify &nbsp;</p>
-                <a href="http://localhost:8888" class="btn btn-lg btn-secondary">Connect</a></div>
-                <form id="createroom">
+              <div class="col-sm-6">
+                <div class ="row">
+                  <div class="col-lg-6">
+                    <form id="joinroom"> 
                       <p class="lead">
-                        <a>NAME PLAYLIST:</a>
+                        <a>ROOM CODE:</a>
                       </p>
-                      <input type="text" name="playlistname"/>
+                      <input type="text" name="roomcode"/>
                       <br/>
-                </form> 
-                <p class="lead">
-                      <a id="YOUR_ID" href="#" onClick={() => this.createRoom()} class="btn btn-lg btn-secondary">CREATE ROOM</a>
-                </p>
-
-
-
-                &nbsp;&nbsp;&nbsp;&nbsp;{/* Adding space in between the two buttons */}
-                <form id="joinroom"> 
-                  <p class="lead">
-                    <a href="">ROOM CODE:</a>
-                  </p>
-                  <input type="text" name="roomcode"/>
-                  <br/>
-                </form>
-                Join Room &nbsp;
-                <button class="btn btn-lg btn-secondary" onClick={() => this.joinRoom()}>Join</button>
-            
-
+                    </form>
+                    Join Room
+                    <button class="btn btn-lg btn-secondary" onClick={() => this.joinRoom()}>Join</button>
+                  </div>
+                  <div class="col-lg-6">
+                  </div>
+                </div>
+              </div>
+            </div> {/* Closing div for first row */}
             <h2>{this.state.playlistName} - {this.state.roomCode}</h2>
-
+            
             <ul align = "left">
             <h2>{this.state.playlistName}</h2> 
             <form onSubmit={this.handleSubmit}>
