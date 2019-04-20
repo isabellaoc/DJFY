@@ -29,11 +29,11 @@ class App extends Component {
           spotifyAccount: {accountName: 'Not Logged In', accountPic: ''},
           
           playlistName:'',
-	        roomCode: ''
+          roomCode: '',
+          value: 'Unchanged'
           };
           
-          this.handleChangeSearch = this.handleChangeSearch.bind(this);
-          this.handleChangePlaylist = this.handleChangePlaylist.bind(this);
+          this.handleChange = this.handleChange.bind(this);
           this.handleSearch = this.handleSearch.bind(this);
         
           this.getHashParams = this.getHashParams.bind(this);
@@ -46,17 +46,11 @@ class App extends Component {
       }
     
 
-    handleChangeSearch(event) {
-        this.setState({search: event.target.value});
-      }
-
-    handleChangePlaylist(event) {
-        this.setState({playlistName: event.target.value});
+    handleChange(event) {
+        this.setState({value: event.target.value});
       }
     
     handleSearch(event) {
-        //alert(this.state.search);
-        //event.preventDefault();
         this.search(this.state.search);
     }
     
@@ -138,7 +132,8 @@ class App extends Component {
     if (this.state.loggedIn) {
         //enters playlist name
         this.setState( {
-          roomCode: this.makeid(4)
+          roomCode: this.makeid(4),
+          playlistName: this.state.value
         })
         var x = document.getElementById("createroom");
         var playlistname = "";
@@ -255,11 +250,11 @@ class App extends Component {
                   }
                     <p>Connect to Spotify &nbsp;</p>
                     <a href="http://localhost:8888" class="btn btn-lg btn-secondary">Connect</a>
-                    <form id="createroom" onSubmit={this.handleSubmit}>
+                    <form id="createroom">
                           <p class="lead">
                             <a>NAME PLAYLIST:</a>
                           </p>
-                          <input  type = 'text' value={this.state.search} onChange={this.handleChangePlaylist} />
+                          <input  type = 'text' value={this.state.search} onChange={this.handleChange} />
                           <br/>
                     </form> 
                     <p class="lead">
@@ -288,13 +283,12 @@ class App extends Component {
               </div>
             </div> {/* Closing div for first row */}
             
-            
             <ul align = "left">
             <h2>{this.state.playlistName} - {this.state.roomCode}</h2>
             <form onSubmit={this.handleSearch}>
               <label>
                 Search:
-                <input  type = 'text' value={this.state.search} onChange={this.handleChangeSearch} />
+                <input  type = 'text' value={this.state.search} onChange={this.handleChange} />
               </label>
               <input type="submit" value="Search" />
             </form>
