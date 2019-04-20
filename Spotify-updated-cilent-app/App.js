@@ -5,7 +5,7 @@ import SpotifyWebApi from 'spotify-web-api-js';
 const spotifyApi = new SpotifyWebApi();
 
 var tracks = ["Song 1", "Song 2", "Song 3", "Song 4", "Song 5"];
-var listItems = tracks.map((tracks) =>
+var listTracks = tracks.map((tracks) =>
   <li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button>{tracks}</li>
 );
 
@@ -96,18 +96,23 @@ class App extends Component {
           var text = "";
           text = x.elements[0].value;
           console.log("code: " + text);
-          if(true/* inDatabase(this.state.value.toUpperCase()*/){
-            alert(this.state.value.toUpperCase() + " is an invalid room code.")
+
+          //check if its a legal inputted code (4 capital characters)
+          if(this.state.value.length == 4){
+            //check if the database has the inputted code
+            if(false/* inDatabase(this.state.value.toUpperCase()*/){
+              //if the database has that code, display the corresponding playlist
+              //enter room
+            }
+            else{
+              //if it doesnt then error out
+              alert(this.state.value.toUpperCase() + " is an invalid room code.");
+            }
           }
           else{
-            //
+            alert(this.state.value.toUpperCase() + " is an invalid room code. \nRoom codes are 4 characters long.")
           }
-          //check if its a legal inputted code (4 capital characters)
-          //check if the database has the inputted code
-          //if the database has that code, display the corresponding playlist
-          //if it doesnt then error out
-          
-          //enter room
+    
   }
 
   makeid(length) {
@@ -120,11 +125,11 @@ class App extends Component {
 
   createRoom() {
     if (this.state.loggedIn) {
-        //enters playlist name
         this.setState( {
           roomCode: this.makeid(4),
           playlistName: this.state.value
         })
+
         var x = document.getElementById("createroom");
         var playlistname = "";
         playlistname = x.elements[0].value;
@@ -142,6 +147,7 @@ class App extends Component {
         //get room code input
         //enter room
         alert("You need to connect to Spotify before you can create a room.");
+
         var x = document.getElementById("createroom");
         var playlistname = "";
         playlistname = x.elements[0].value;
@@ -287,7 +293,7 @@ class App extends Component {
             </form>
               
                   <br/> <br/>
-                  {listItems}
+                  {listTracks}
             </ul> 
 
           </div>
