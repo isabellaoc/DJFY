@@ -21,9 +21,11 @@ class App extends Component {
       super();
       //const params = this.getHashParams(); access_token
       //const token = params.access_token;
-      const token = this.getUrlParams();
+      //const token = this.getUrlParams();
+      const token = this.getUrlParams2("access_token");
       console.log("token: " + token);
       if (token) {
+        console.log("setting token...");
           spotifyApi.setAccessToken(token);
       }
       this.state = {
@@ -121,6 +123,8 @@ class App extends Component {
                     }
                 });
             })
+        var user = spotifyApi.getMe();
+        console.log("user id: " + user.id)
     }
 
     joinRoom() {
@@ -176,6 +180,10 @@ class App extends Component {
         //Spotify calls: makeplaylist(playlistname)
         //save to database the room code, spotify access token, playlist name
         //display the playlist
+        var token = this.getUrlParams2("access_token");
+        console.log("token create room: " + token);
+        spotifyApi.setAccessToken(token);
+        console.log("create room user id: " + spotifyApi.getMe().id)
       }
     else {
         //get room code input
@@ -184,6 +192,8 @@ class App extends Component {
         var token2 = this.getUrlParams("access_token");
         var token = this.getUrlParams2("access_token");
         console.log("token create room: " + token);
+        spotifyApi.setAccessToken(token);
+        console.log("create room user id: " + spotifyApi.getMe().id)
         var x = document.getElementById("createroom");
         var playlistname = "";
         playlistname = x.elements[0].value;
