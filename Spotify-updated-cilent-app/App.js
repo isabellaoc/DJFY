@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import './css/bootstrap.css';
 
 import SpotifyWebApi from 'spotify-web-api-js';
-const spotifyApi = new SpotifyWebApi();
-
+var spotifyApi = new SpotifyWebApi();
 var tracks = ["Song 1", "Song 2", "Song 3", "Song 4", "Song 5"];
 var listTracks = tracks.map((tracks) =>
   <li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button>{tracks}</li>
@@ -11,17 +10,19 @@ var listTracks = tracks.map((tracks) =>
 
 var snapshot = '';
 var currentTrack = '';
-
+var mainid = '';
 
 
 class App extends Component {
 
     // Get access token to be able to fetch data from the Spotify API
-    constructor() {
-      super();
+    constructor(props) {
+      super(props);
       //const params = this.getHashParams(); access_token
       //const token = params.access_token;
       //const token = this.getUrlParams();
+      
+
       const token = this.getUrlParams2("access_token");
       console.log("token: " + token);
       if (token) {
@@ -30,7 +31,7 @@ class App extends Component {
       }
       this.state = {
           loggedIn: token ? true : false,
-          spotifyAccount: {accountName: 'Not Logged In', accountPic: ''},
+          spotifyAccount: {accountName: 'Not Logged In', accountPic: '', Id: ''},
           
           playlistName:'',
           roomCode: '',
@@ -127,21 +128,43 @@ getID(data) {
 						            Id: response.id
                     }
                 });
-                console.log("id check again: " + response.json().then(data =>data.id));
+                //console.log("id check again: " + response.Id;//response.json().then(data =>data.id));
             })
             var token = this.getUrlParams2("access_token");
         //var user = spotifyApi.getMe();
         //var id = spotifyApi.getMe().then((response) => {this.state return this.state.spotifyAccount.Id};
-        console.log("user id gc: " + spotifyApi.getMe().then(response=> response.json()).then(data=> console.log(data))); // => {spotifyAccount.Id})); //this.state.spotifyAccount.Id
-            var id = fetch('https://api.spotify.com/v1/me', {headers: {'Authorization':'Bearer ' + token}})
-            .then(response => response.json())
-            .then(data=>this.setState({spotifyAccount: {user: {name:data.display_name}}}));
+       // console.log("user id gc: " + spotifyApi.getMe().then(response=> response.json()).then(data=> console.log(data))); // => {spotifyAccount.Id})); //this.state.spotifyAccount.Id
+            /*var id = fetch('https://api.spotify.com/v1/me', {
+              headers: {'Authorization':'Bearer ' + token}
+            }).then(response => response.json())
+            .then(data=>this.setState({spotifyAccount: id}));
             //.then(data => data.id));//
-            console.log("ID IDIDIDI: " + id);
-            
+            var idc=fetch('https://api.spotify.com/v1/me', {
+              headers: {'Authorization': 'Bearer ' + token}
+            }).id;
+            console.log("id2: " + fetch('https://api.spotify.com/v1/me', {
+              headers: {'Authorization': 'Bearer ' + token}
+            }).id);
+            console.log("ID IDIDIDI: " + idc); //spotifyApi.getMe().then((response) => {this.setState( { SpotifyAccount: { Id: response.id }});));
+            console.log("im in get connectedd id: "+ mainid); */
+            var token = this.getUrlParams2("access_token");
+            //var testy = '';
+            fetch('https://api.spotify.com/v1/me', {headers: {'Authorization':'Bearer ' + token}})
+            .then(response => response.json())
+            .then(data => this.print(data.id));
+           // console.log("testy: " + testy);
+           spotifyApi.setAccessToken(token);
+           // var token = this.getUrlParams2("access_token");
+            fetch('https://api.spotify.com/v1/me', {headers: {'Authorization':'Bearer ' + token}})
+            .then(response => response.json())
+            .then(data =>console.log("but this works: " + data.id));
     }
 
- 
+    print(word) { 
+      console.log("print func: " + word);
+      this.props.spotifyAccount.Id = word;
+      console.log("print props func: " + this.props.spotifyAccount.Id);
+    }
     joinRoom() {
 
           var x = document.getElementById("joinroom");
@@ -175,6 +198,12 @@ getID(data) {
      return text;
    }
 
+  createNewPlaylistHelper(id, name) {
+    console.log("helper id: "+ id);
+    this.createNewPlaylist(id, name);
+    
+  }
+
   createRoom() {
     if (this.state.loggedIn) {
         this.setState( {
@@ -188,8 +217,11 @@ getID(data) {
         var roomcode = this.makeid(4)
         console.log("playlistname: " + playlistname);
         console.log("room code: " + roomcode)
-        
-        this.createNewPlaylist();
+        var token = this.getUrlParams2("access_token");
+        fetch('https://api.spotify.com/v1/me', {headers: {'Authorization':'Bearer ' + token}})
+            .then(response => response.json())
+            .then(data => this.createNewPlaylistHelper(data.id,playlistname));
+        //var playlist = this.createNewPlaylistHelper();
         //var url = window.location.href;// + 
         //enter room
         //Spotify calls: makeplaylist(playlistname)
@@ -199,6 +231,7 @@ getID(data) {
         console.log("token create room: " + token);
         spotifyApi.setAccessToken(token);
         console.log("create room user id: " + this.state.spotifyAccount.Id)
+        console.log("im in get create room id: "+ mainid); 
       }
     else {
         //get room code input
@@ -234,17 +267,27 @@ createNewPlaylistCallback(error, value) {
     //var playlistID = value.id;
     //var url = window.location.href + "?x=" + playlistID;
    // console.log("playlist ID from callback: " + playlistID);
+  /* var playlistID = value.id;
+    var url = window.location.href + "?x=" + playlistID;
+    console.log("playlist ID from callbak: " + playlistID);
   if(error!=null) {
     //get the playlist ID
-    var playlistID = value.id;
-    var url = window.location.href + "?x=" + playlistID;
-    console.log("playlist ID: " + playlistID);
+    
 
-  }
+  }*/
 }
-	
-createNewPlaylist(id)	{
-  var playlistObject = spotifyApi.createPlaylist(id,null,this.createNewPlaylistCallback())
+
+buildURL(playlistID) {
+  var url = window.location.href + "?x=" + playlistID;
+  console.log("URL TO SHARE: " + url);
+}
+
+createNewPlaylist(id, playlistname)	{
+  var playlistID;
+  var playlistObject = spotifyApi.createPlaylist(id,{name:playlistname},function(error, value)
+    {console.log("error: "+error);
+    //console.log("value: "+value.id);
+    playlistID = value.id;})
     .then((response) => {
       this.setState( {
         newPlaylist: {
@@ -254,9 +297,15 @@ createNewPlaylist(id)	{
         }
       });
     })
-
-   var playlistID = playlistObject.id; 
-   console.log("playlist ID not from callback: " + playlistID);
+    console.log("playlist id: " + playlistID);
+    var url = window.location.href + "?x=" + playlistID;
+    console.log("URL TO SHARE: " + url);
+    /*spotifyApi.createPlaylist(id,{name:playlistname},this.createNewPlaylistCallback())
+    .then(response => response.json())
+            .then(data => console.log("two: " + data.id));
+   var playlistID = playlistObject.id; */
+    
+   //console.log("playlist ID not from callback: " + playlistID);
 }
 
 
@@ -305,6 +354,8 @@ createNewPlaylist(id)	{
 
     // Display our data
     render() {
+      mainid = this.props.id;
+      console.log("im in render: " + mainid);
         return (
           <div className="App">
             <h1 class="cover-heading">DJFY</h1>
@@ -316,7 +367,7 @@ createNewPlaylist(id)	{
                   <div class="col-lg-6">
                     Spotify Account: {this.state.spotifyAccount.accountName}
                     <img  src={this.state.spotifyAccount.accountPic} style={{ height: 100 }}/>
-                    user id: {this.state.spotifyAccount.Id}
+                    {/*user id: {this.state.spotifyAccount.Id}*/}
                     <br /> <br /> {/* Show button to check spotify account */}
                   {
                     this.state.loggedIn &&
