@@ -89,11 +89,23 @@ class App extends Component {
   getUrlParams() {
     var url_string = window.location.href;
     var url = new URL(url_string);
-    var c = url.searchParams.get("access_token");
-    console.log(c);
+    var c = url.searchParams.get("#access_token");
+    console.log("testy: " + c);
     return c;
   }
   
+  getUrlParams2( prop ) {
+    var params = {};
+    var search = decodeURIComponent( window.location.href.slice( window.location.href.indexOf( '#' ) + 1 ) );
+    var definitions = search.split( '&' );
+
+    definitions.forEach( function( val, key ) {
+        var parts = val.split( '=', 2 );
+        params[ parts[ 0 ] ] = parts[ 1 ];
+    } );
+
+    return ( prop && prop in params ) ? params[ prop ] : params;
+}
 
     // Request API data
     // Using library provided by JMPerez/spotify-web-api-js
@@ -169,7 +181,8 @@ class App extends Component {
         //get room code input
         //enter room
         alert("You need to connect to Spotify before you can create a room.");
-        var token = this.getUrlParams();
+        var token2 = this.getUrlParams("access_token");
+        var token = this.getUrlParams2("access_token");
         console.log("token create room: " + token);
         var x = document.getElementById("createroom");
         var playlistname = "";
