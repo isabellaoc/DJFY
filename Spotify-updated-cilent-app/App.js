@@ -19,8 +19,10 @@ class App extends Component {
     // Get access token to be able to fetch data from the Spotify API
     constructor() {
       super();
-      const params = this.getHashParams();
-      const token = params.access_token;
+      //const params = this.getHashParams(); access_token
+      //const token = params.access_token;
+      const token = this.getUrlParams();
+      console.log("token: " + token);
       if (token) {
           spotifyApi.setAccessToken(token);
       }
@@ -71,8 +73,27 @@ class App extends Component {
          hashParams[e[1]] = decodeURIComponent(e[2]);
          e = r.exec(q);
       }
+      //console.log(hashParams)
+      
       return hashParams;
     }
+
+    getUrlVars() {
+      var vars = {};
+      var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+          vars[key] = value;
+      });
+      return vars;
+  }
+
+  getUrlParams() {
+    var url_string = window.location.href;
+    var url = new URL(url_string);
+    var c = url.searchParams.get("access_token");
+    console.log(c);
+    return c;
+  }
+  
 
     // Request API data
     // Using library provided by JMPerez/spotify-web-api-js
@@ -138,7 +159,7 @@ class App extends Component {
         console.log("room code: " + roomcode)
         
         this.createNewPlaylist();
-        var url = window.location.href;// + 
+        //var url = window.location.href;// + 
         //enter room
         //Spotify calls: makeplaylist(playlistname)
         //save to database the room code, spotify access token, playlist name
@@ -148,7 +169,8 @@ class App extends Component {
         //get room code input
         //enter room
         alert("You need to connect to Spotify before you can create a room.");
-
+        var token = this.getUrlParams();
+        console.log("token create room: " + token);
         var x = document.getElementById("createroom");
         var playlistname = "";
         playlistname = x.elements[0].value;
@@ -273,7 +295,7 @@ createNewPlaylist(id)	{
                           <br/>
                     </form> 
                     <p class="lead">
-                          <a id="YOUR_ID" href="#" onClick={() => this.createRoom()} class="btn btn-lg btn-secondary">CREATE ROOM</a>
+                          <a id="YOUR_ID" onClick={() => this.createRoom()} class="btn btn-lg btn-secondary">CREATE ROOM</a>
                     </p>
                   </div>
                 </div>
