@@ -2,6 +2,24 @@ import React, { Component } from 'react';
 import './css/bootstrap.css';
 
 import SpotifyWebApi from 'spotify-web-api-js';
+//import url from 'url-parameters';
+
+const urlListener = require('url-listener')
+ 
+urlListener(event => {
+  // your logic here!
+  console.log('URL UPDATED!')
+})
+/*function onChangeCallback(){
+  console.log("did something changed?");
+}*/
+//url.enable(onChangeCallback, false);
+/*url.enable(onChange => {
+  console.log("=-=-=-=-=-=-=url param was changed=-=-=-=-=-=-=");
+  //console.log(onChange.queryParams); // object
+ // console.log(onChange.queryString); // string
+  
+});*/
 var spotifyApi = new SpotifyWebApi();
 var tracks = ["Song 1", "Song 2", "Song 3", "Song 4", "Song 5"];
 var listTracks = tracks.map((tracks) =>
@@ -13,8 +31,14 @@ var currentTrack = '';
 var mainid = '';
 
 
-class App extends Component {
 
+class App extends Component {
+   isTherePlaylistID() {
+    var idCheck = this.getUrlParams2("playlist_id");
+    if(idCheck) {
+      console.log("WE HAVE A PLAYLIST ID IN THE URL: " + idCheck);
+    }
+  }
     // Get access token to be able to fetch data from the Spotify API
     constructor(props) {
       super(props);
@@ -29,6 +53,7 @@ class App extends Component {
         console.log("setting token...");
           spotifyApi.setAccessToken(token);
       }
+      this.isTherePlaylistID();
       this.state = {
           loggedIn: token ? true : false,
           spotifyAccount: {accountName: 'Not Logged In', accountPic: '', Id: ''},
@@ -162,7 +187,7 @@ getID(data) {
 
     print(word) { 
       console.log("print func: " + word);
-      this.props.spotifyAccount.Id = word;
+      //this.props.spotifyAccount.Id = word;
       console.log("print props func: " + this.props.spotifyAccount.Id);
     }
     joinRoom() {
@@ -287,11 +312,13 @@ async createNewPlaylistCallback(error, value) {
    console.log("2error: "+error);
    playlistID = value.id;
    console.log("2value: "+value.id);
-   var url = window.location.href + "?x=" + playlistID;
+   var url = window.location.href + "&playlist_id=" + playlistID;
    console.log("2URL TO SHARE: " + url);
    //this.buildURL(playlistID);
-   window.location.assign(url);
-
+   await window.location.assign(url);
+   window.location.href = url;
+   var idcheck = this.getUrlParams2("playlist_id");
+   console.log("playlist id from params: " + idcheck);
    return playlistID;
   }
 
@@ -459,7 +486,6 @@ spotifyApi.createPlaylist(id,{name:playlistname},await this.createNewPlaylistCal
         );
     }
 }
-
 
 
 export default App;
