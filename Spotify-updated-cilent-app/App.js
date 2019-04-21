@@ -138,11 +138,12 @@ class App extends Component {
         console.log("room code: " + roomcode)
         
         this.createNewPlaylist();
+        var url = window.location.href;// + 
         //enter room
         //Spotify calls: makeplaylist(playlistname)
         //save to database the room code, spotify access token, playlist name
         //display the playlist
-    } 
+      }
     else {
         //get room code input
         //enter room
@@ -160,28 +161,45 @@ class App extends Component {
 }
 
 /*createlink() { 
-  var code = makeid(4);
+  //var code = makeid(4);
   console.log("test")
-  var url = "playlist.html?x=" + code;
+  var url = window.location.href;// + code;
   var element = document.getElementById('YOUR_ID');
   element.setAttribute("href",url)
   return code;
 }*/
 
+createNewPlaylistCallback(error, value) {
+  //console.log("playlist callbacK");
+    //var playlistID = value.id;
+    //var url = window.location.href + "?x=" + playlistID;
+   // console.log("playlist ID from callback: " + playlistID);
+  if(error!=null) {
+    //get the playlist ID
+    var playlistID = value.id;
+    var url = window.location.href + "?x=" + playlistID;
+    console.log("playlist ID: " + playlistID);
 
+  }
+}
 	
-	createNewPlaylist(id)	{
-		spotifyApi.createPlaylist(id)
-			.then((response) => {
-				this.setState( {
-					newPlaylist: {
-						name: response.name,
-						snId: response.snapshot_id,
-						tracks: response.tracks.items
-					}
-				});
-			})
-	}
+createNewPlaylist(id)	{
+  var playlistObject = spotifyApi.createPlaylist(id,null,this.createNewPlaylistCallback())
+    .then((response) => {
+      this.setState( {
+        newPlaylist: {
+          name: response.name,
+          snId: response.snapshot_id,
+          tracks: response.tracks.items
+        }
+      });
+    })
+
+   var playlistID = playlistObject.id; 
+   console.log("playlist ID not from callback: " + playlistID);
+}
+
+
 	
 	search(q) {
 		spotifyApi.search(q, 'track')
@@ -255,13 +273,13 @@ class App extends Component {
                           <br/>
                     </form> 
                     <p class="lead">
-                          <a id="YOUR_ID" /*href="#"*/ onClick={() => this.createRoom()} class="btn btn-lg btn-secondary">CREATE ROOM</a>
+                          <a id="YOUR_ID" href="#" onClick={() => this.createRoom()} class="btn btn-lg btn-secondary">CREATE ROOM</a>
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div class="col-sm-6">
+              {/*<div class="col-sm-6">
                 <div class ="row">
                   <div class="col-lg-6">
 
@@ -279,7 +297,7 @@ class App extends Component {
                   <div class="col-lg-6">
                   </div>
                 </div>
-              </div>
+              </div>*/}
             </div> {/* Closing div for first row */}
             
             <ul align = "left">
