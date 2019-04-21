@@ -198,10 +198,11 @@ getID(data) {
      return text;
    }
 
-  createNewPlaylistHelper(id, name) {
+  async createNewPlaylistHelper(id, name) {
     console.log("helper id: "+ id);
-    this.createNewPlaylist(id, name);
-    
+    await this.createNewPlaylist(id, name);
+    var playlistID = this.getUrlParams2("x");
+    console.log("here is the playlist ID: "+ playlistID);
   }
 
   createRoom() {
@@ -221,6 +222,7 @@ getID(data) {
         fetch('https://api.spotify.com/v1/me', {headers: {'Authorization':'Bearer ' + token}})
             .then(response => response.json())
             .then(data => this.createNewPlaylistHelper(data.id,playlistname));
+        console.log("hi imback here!");
         //var playlist = this.createNewPlaylistHelper();
         //var url = window.location.href;// + 
         //enter room
@@ -261,8 +263,16 @@ getID(data) {
   element.setAttribute("href",url)
   return code;
 }*/
+/*function Create(callback) {
+  var playlistIDState = false;
+  return { 
+    getplaylistIDState  : function()  { return playlistIDState; },
+    setplaylistIDState  : function(p) { playlistIDState = p; callback(playlistIDState, isRunning); },
+  };
+}*/
 
-createNewPlaylistCallback(error, value) {
+
+async createNewPlaylistCallback(error, value) {
   //console.log("playlist callbacK");
     //var playlistID = value.id;
     //var url = window.location.href + "?x=" + playlistID;
@@ -272,23 +282,41 @@ createNewPlaylistCallback(error, value) {
     console.log("playlist ID from callbak: " + playlistID);
   if(error!=null) {
     //get the playlist ID
-    
+    */
+   var playlistID;
+   console.log("2error: "+error);
+   playlistID = value.id;
+   console.log("2value: "+value.id);
+   var url = window.location.href + "?x=" + playlistID;
+   console.log("2URL TO SHARE: " + url);
+   //this.buildURL(playlistID);
+   window.location.assign(url);
 
-  }*/
-}
+   return playlistID;
+  }
+
 
 buildURL(playlistID) {
   var url = window.location.href + "?x=" + playlistID;
   console.log("URL TO SHARE: " + url);
 }
 
-createNewPlaylist(id, playlistname)	{
+async createNewPlaylist(id, playlistname)	{
   var playlistID;
-  var playlistObject = spotifyApi.createPlaylist(id,{name:playlistname},function(error, value)
+  /*var playlistObject = spotifyApi.createPlaylist(id,{name:playlistname},function(error, value)
     {console.log("error: "+error);
-    //console.log("value: "+value.id);
-    playlistID = value.id;})
-    .then((response) => {
+    playlistID = value.id;
+    console.log("value: "+value.id);
+    var url = window.location.href + "&x=" + playlistID;
+console.log("URL TO SHARE: " + url);
+window.location.assign(url);
+
+//this.App.buildURL(playlistID);
+return playlistID;});*/
+var error;
+var value;
+spotifyApi.createPlaylist(id,{name:playlistname},await this.createNewPlaylistCallback);
+    /*.then((response) => {
       this.setState( {
         newPlaylist: {
           name: response.name,
@@ -296,9 +324,10 @@ createNewPlaylist(id, playlistname)	{
           tracks: response.tracks.items
         }
       });
-    })
+    })*/
+    //console.log("playlist object: " + playlistObject);
     console.log("playlist id: " + playlistID);
-    var url = window.location.href + "?x=" + playlistID;
+    var url = window.location.href + "&x=" + playlistID;
     console.log("URL TO SHARE: " + url);
     /*spotifyApi.createPlaylist(id,{name:playlistname},this.createNewPlaylistCallback())
     .then(response => response.json())
