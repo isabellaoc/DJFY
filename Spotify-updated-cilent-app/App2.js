@@ -17,21 +17,23 @@ class App extends Component {
     constructor() {
       super();
       const params = this.getHashParams();
-      const token = params.access_token;
+      const token = this.getUrlParams2("access_token");
       if (token) {
+		  console.log("setting token...");
           spotifyApi.setAccessToken(token);
       }
       this.state = {
           loggedIn: token ? true : false,
           spotifyAccount: {accountName: 'Not Logged In', accountPic: ''},
-          playlistName:'Playlist Name',
-	        roomCode: '00000000'
+          
+		  playlistName:'',
+	      roomCode: '',
+		  value: ''
           };
         this.handleChange = this.handleChange.bind(this);
         this.handleSearch = this.handleSearch.bind(this);
 
-		this.getHashParams = this.getHashParams.bind(this);
-		
+		this.getHashParams = this.getHashParams.bind(this);	
 		this.createRoom = this.createRoom.bind(this);
         this.getConnectedAccount = this.getConnectedAccount.bind(this);
         this.createNewPlaylist = this.createNewPlaylist.bind(this);
@@ -70,12 +72,44 @@ class App extends Component {
       }
       return hashParams;
     }
+	
+	 getUrlVars() {
+      var vars = {};
+      var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+          vars[key] = value;
+      });
+      return vars;
+  }
 
+
+
+  getUrlParams() {
+    var url_string = window.location.href;
+    var url = new URL(url_string);
+    var c = url.searchParams.get("#access_token");
+
+    console.log("testy: " + c);
+
+    return c;
+  } 
+
+  getUrlParams2( prop ) {
+    var params = {};
+    var search = decodeURIComponent( window.location.href.slice( window.location.href.indexOf( '#' ) + 1 ) );
+    var definitions = search.split( '&' );
+
+    definitions.forEach( function( val, key ) {
+        var parts = val.split( '=', 2 );
+        params[ parts[ 0 ] ] = parts[ 1 ];
+    } );
+
+    return ( prop && prop in params ) ? params[ prop ] : params;
+  }
+	
     // Request API data
     // Using library provided by JMPerez/spotify-web-api-js
     // (https://github.com/JMPerez/spotify-web-api-js)
     getConnectedAccount() {
-		var Id = '';
         spotifyApi.getMe()
             .then((response) => {
                 this.setState( {
@@ -96,7 +130,7 @@ class App extends Component {
      //return text;
    //}
 
-  createRoom() {
+  createRoom(id) {
     if (this.state.loggedIn) {
         //enters playlist name
 		var playlistName = ''
@@ -105,20 +139,58 @@ class App extends Component {
           playlistName: 'Name that is entered'
         })
         //enter room
-		this.createNewPlaylist(this.getConnectedAccount.Id, playlistName);
-    } 
-    else {
-        //get room code input
-        //enter room
+		this.createNewPlaylist(id, playlistName);
+
         var x = document.getElementById("createroom");
         var playlistname = "";
         playlistname = x.elements[0].value;
         var roomcode = window.location.href;
         console.log("playlistname: " + playlistname);
+        console.log("room code: " + roomcode);
+		this.createNewPlaylist();
+		//var url = window.location.href;// + 
+        //enter room
+        //Spotify calls: makeplaylist(playlistname)
+        //save to database the room code, spotify access token, playlist name
+        //display the playlist
+        var token = this.getUrlParams2("access_token");
+        console.log("token create room: " + token);
+        spotifyApi.setAccessToken(token);
+        console.log("create room user id: " + spotifyApi.getMe().id)
+      }
+
+    else {
+        //get room code input
+        //enter room
+        alert("You need to connect to Spotify before you can create a room.");
+        var token2 = this.getUrlParams("access_token");
+        var token = this.getUrlParams2("access_token");
+        console.log("token create room: " + token);
+        spotifyApi.setAccessToken(token);
+        console.log("create room user id: " + spotifyApi.getMe().id)
+        var x = document.getElementById("createroom");
+        var playlistname = "";
+        playlistname = x.elements[0].value;
+        var roomcode = this.makeid(4)
+        console.log("playlistname: " + playlistname);
         console.log("room code: " + roomcode)
+        //this shouldn't create a code. I only have it here for testing purposes. 
+        //if its not logged in they shouldny be able to make a room
     }
 }
 
+createNewPlaylistCallback(error, value) {
+  //console.log("playlist callbacK");
+    //var playlistID = value.id;
+    //var url = window.location.href + "?x=" + playlistID;
+   // console.log("playlist ID from callback: " + playlistID);
+  if(error!=null) {
+    //get the playlist ID
+    var playlistID = value.id;
+    var url = window.location.href + "?x=" + playlistID;
+    console.log("playlist ID: " + playlistID);
+  }
+}
 
 
 /*createlink() { 
@@ -132,75 +204,96 @@ class App extends Component {
 
 	createNewPlaylist(id, n)	{
 		var snId = '';
-		spotifyApi.createPlaylist(id)
+		var playlistObject = spotifyApi.createPlaylist(id,null,this.createNewPlaylistCallback())
 			.then((response) => {
 				this.setState( {
 					newPlaylist: {
 						name: response.name,
+						//snapshot is most up to date version of the playlist its called from
 						snId: response.snapshot_id,
-						tracks: response.tracks.items
 					}
 				});
 			})
+		snapshot = snId
+		var playlistID = playlistObject.id; 
+		console.log("playlist ID not from callback: " + playlistID)
+			
 		var name = {
 				name: n
-		}		
+		}
 		spotifyApi.changePlaylistDetails(snId, name)
 	}
 	
-	
+	//types.join is a mystery
 	search(q) {
 		spotifyApi.search(q, 'track')
 		.then((response) => {
 			this.setState( {
+				//gets an array of items from within a package object
 				results: response.track.items
 			});
 		})
+		//want to make these clickable so that currentTrack gets the id
 		var list = this.state.results.map((results) =>
 			<li>{this.state.results.name}</li>
-		//var store = 'stores the track id'	
-		//getTrack(store.id)	
+		//currentTrack = 'stores the track id'	
+		//getTrack(currentTrack)	
 		);
 	}
 
+	//traId is the id of the track object, not playlist or user
 	getTrack(traId) {
 		spotifyApi.getTrack(traId)
 			.then((response) => {
 				this.setState( {
 					name: response.name,
+					//uri is a resource identifer to locate an artist, album, or track
 					newTrack: response.uri
 				});				
 			})
 		//display name of track
+		currentTrack = newTrack
 		//add track button onClick() => addTracks
+		//first button = addTracks()
+		//second button = removeTracks()
 	}
 	
-	addTracks(snId) {
-		var uri = this.state.getTrack.newTrack
-		spotifyApi.addTracksToPlaylist(snId, uri)
+	
+	addTracks() {
+		spotifyApi.addTracksToPlaylist(snapshot, currentTrack)
 			.then((response) => {
 				this.setState( {
 					snId: response.snapshot_id
 				});
 			})
-		//spotifyApi.getPlaylist(this.state.createNewPlaylist.snId)
+		//updates the tracks array everytime a new track is added	
+		//spotifyApi.getPlaylist(snapshot)
 			//.then((response) => {
 				//tracks: response.tracks
-			//});			
+			//});
+		//tracks = tracks
+		snapshot = snId
 	}
 
-	removeTracks(snId) {
-		var uri = this.state.getTrack.newTrack
-		spotifyApi.removeTracksFromPlaylistWithSnapshotId(snId, uri)
+	removeTracks() {
+		spotifyApi.removeTracksFromPlaylistWithSnapshotId(snapshot, currentTrack)
 			.then((response) => {
 				this.setState( {
 					snId: response.snapshot_id
 				});
 			})
+			//updates when a track is removed
+			//spotifyApi.getPlaylist(snapshot)
+				//.then((response) => {
+					//tracks: response.tracks
+				//});
+			//tracks = tracks
+			snapshot = snId
 	}
 
     // Display our data
     render() {
+		var us = this.state.spotifyAccount
         return (
           <div className="App">
             <h1 class="cover-heading">DJFY</h1>
@@ -210,7 +303,8 @@ class App extends Component {
                   <div class="col-lg-6">
                   </div>
                   <div class="col-lg-6">
-                    Spotify Account: {this.state.spotifyAccount.accountName}
+                    Spotify Account: {" "+ this.state.spotifyAccount.accountName + " "}
+					ID: {this.state.spotifyAccount.id}
                     <img  src={this.state.spotifyAccount.accountPic} style={{ height: 100 }}/>
                     <br /> <br /> {/* Show button to check spotify account */}
                   {
@@ -229,7 +323,7 @@ class App extends Component {
                           <br/>
                     </form> 
                     <p class="lead">
-                          <a id="YOUR_ID" href="#" onClick={() => this.createRoom()} class="btn btn-lg btn-secondary">CREATE ROOM</a>
+                          <a id="YOUR_ID" href="#" onClick={() => this.createRoom(us.id)} class="btn btn-lg btn-secondary">CREATE ROOM	</a>
                     </p>
                   </div>
                 </div>
