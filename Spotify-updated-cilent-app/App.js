@@ -35,6 +35,7 @@ class App extends Component {
           playlistName:'',
           roomCode: '',
           value: '',
+
           };
           
           this.handleChange = this.handleChange.bind(this);
@@ -109,24 +110,38 @@ class App extends Component {
     return ( prop && prop in params ) ? params[ prop ] : params;
 }
 
+getID(data) {
+  console.log("get data funtion: " + data);
+}
+
     // Request API data
     // Using library provided by JMPerez/spotify-web-api-js
     // (https://github.com/JMPerez/spotify-web-api-js)
     getConnectedAccount() {
-        spotifyApi.getMe()
+        var user = spotifyApi.getMe()
             .then((response) => {
                 this.setState( {
                     spotifyAccount: {
                         accountName: response.display_name,
                         accountPic: response.images[0].url,
-						Id: response.id
+						            Id: response.id
                     }
                 });
+                console.log("id check again: " + response.json().then(data =>data.id));
             })
-        var user = spotifyApi.getMe();
-        console.log("user id: " + user.id)
+            var token = this.getUrlParams2("access_token");
+        //var user = spotifyApi.getMe();
+        //var id = spotifyApi.getMe().then((response) => {this.state return this.state.spotifyAccount.Id};
+        console.log("user id gc: " + spotifyApi.getMe().then(response=> response.json()).then(data=> console.log(data))); // => {spotifyAccount.Id})); //this.state.spotifyAccount.Id
+            var id = fetch('https://api.spotify.com/v1/me', {headers: {'Authorization':'Bearer ' + token}})
+            .then(response => response.json())
+            .then(data=>this.setState({spotifyAccount: {user: {name:data.display_name}}}));
+            //.then(data => data.id));//
+            console.log("ID IDIDIDI: " + id);
+            
     }
 
+ 
     joinRoom() {
 
           var x = document.getElementById("joinroom");
@@ -183,7 +198,7 @@ class App extends Component {
         var token = this.getUrlParams2("access_token");
         console.log("token create room: " + token);
         spotifyApi.setAccessToken(token);
-        console.log("create room user id: " + spotifyApi.getMe().id)
+        console.log("create room user id: " + this.state.spotifyAccount.Id)
       }
     else {
         //get room code input
@@ -301,6 +316,7 @@ createNewPlaylist(id)	{
                   <div class="col-lg-6">
                     Spotify Account: {this.state.spotifyAccount.accountName}
                     <img  src={this.state.spotifyAccount.accountPic} style={{ height: 100 }}/>
+                    user id: {this.state.spotifyAccount.Id}
                     <br /> <br /> {/* Show button to check spotify account */}
                   {
                     this.state.loggedIn &&
