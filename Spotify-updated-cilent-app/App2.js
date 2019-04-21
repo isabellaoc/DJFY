@@ -243,6 +243,7 @@ createNewPlaylistCallback(error, value) {
 
 	//traId is the id of the track object, not playlist or user
 	getTrack(traId) {
+		var newTrack = ''
 		spotifyApi.getTrack(traId)
 			.then((response) => {
 				this.setState( {
@@ -260,6 +261,7 @@ createNewPlaylistCallback(error, value) {
 	
 	
 	addTracks() {
+		var snId = ''
 		spotifyApi.addTracksToPlaylist(snapshot, currentTrack)
 			.then((response) => {
 				this.setState( {
@@ -276,6 +278,7 @@ createNewPlaylistCallback(error, value) {
 	}
 
 	removeTracks() {
+		var snId = ''
 		spotifyApi.removeTracksFromPlaylistWithSnapshotId(snapshot, currentTrack)
 			.then((response) => {
 				this.setState( {
