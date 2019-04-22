@@ -2,7 +2,10 @@
  * DJFY server code:
  *   Node.js script that performs the Authorization Code oAuth2 flow
  *   to authenticate against the Spotify Accounts.
- *  
+ *   
+ *   https://developer.spotify.com/documentation/general/guides/authorization-guide/
+ *   Based on code provided by: https://github.com/spotify/web-api-auth-examples
+ *   
  */
 
 var express = require('express'); // Express web server framework
@@ -13,6 +16,7 @@ var cookieParser = require('cookie-parser');
 var client_id = 'ed2d4bbb071e479486b956e0749346f8';
 var client_secret = '1261a30a6827432e8ddba467b29d17ef';
 var redirect_uri = 'http://localhost:8888/callback';
+// Change redirect_uri to live server when deploying
 
 var server_port = process.env.PORT || 8888;
 // Uses 8888 when running locally
@@ -103,6 +107,7 @@ app.get('/callback', function(req, res) {
         });
 
         // we can also pass the token to the browser to make requests from there
+        // Change link to live web server when deploying
         res.redirect('http://localhost:3000/#' +
           querystring.stringify({
             access_token: access_token,
