@@ -10,43 +10,35 @@ urlListener(event => {
   // your logic here!
   console.log('URL UPDATED!')
 })
-/*function onChangeCallback(){
-  console.log("did something changed?");
-}*/
-//url.enable(onChangeCallback, false);
-/*url.enable(onChange => {
-  console.log("=-=-=-=-=-=-=url param was changed=-=-=-=-=-=-=");
-  //console.log(onChange.queryParams); // object
- // console.log(onChange.queryString); // string
-  
-});*/
+
 var spotifyApi = new SpotifyWebApi();
-var tracks = ["Song 1", "Song 2", "Song 3", "Song 4", "Song 5"];
+var tracks = [];
 var listTracks = tracks.map((tracks) =>
   <li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button>{tracks}</li>
 );
 
-var snapshot = '';
-var currentTrack = '';
-var mainid = '';
+//var snapshot = '';
+//var currentTrack = '';
+//var mainid = '';
 
 
 
 class App extends Component {
+
+  //This checks if there is a playlist ID currently in the URL
+  //this is for the guest users that have the shared link
+  //it should immediately print the playlist tracks/info 
    isTherePlaylistID() {
     var idCheck = this.getUrlParams2("playlist_id");
-    if(idCheck) {
+    if(idCheck && idCheck.length >2) {
       console.log("WE HAVE A PLAYLIST ID IN THE URL: " + idCheck);
+      this.getPlaylistHelper(idCheck);
+
     }
   }
     // Get access token to be able to fetch data from the Spotify API
     constructor(props) {
       super(props);
-      //const params = this.getHashParams(); access_token
-      //const token = params.access_token;
-      //const token = this.getUrlParams();
-      
-
       const token = this.getUrlParams2("access_token");
       console.log("token: " + token);
       if (token) {
@@ -67,9 +59,13 @@ class App extends Component {
           this.handleChange = this.handleChange.bind(this);
           this.handleSearch = this.handleSearch.bind(this);
         
-          this.getHashParams = this.getHashParams.bind(this);
+          //this.getHashParams = this.getHashParams.bind(this);
           this.getConnectedAccount = this.getConnectedAccount.bind(this);
           this.createNewPlaylist = this.createNewPlaylist.bind(this);
+          this.createNewPlaylistCallback = this.createNewPlaylistCallback.bind(this);
+          this.createNewPlaylistHelper = this.createNewPlaylistHelper.bind(this);
+          this.getPlaylistHelper = this.getPlaylistHelper.bind(this);
+          this.getPlaylistTracksCallback = this.getPlaylistTracksCallback.bind(this);
           this.search = this.search.bind(this);
           this.getTrack = this.getTrack.bind(this);
           this.addTracks = this.addTracks.bind(this);
@@ -90,38 +86,6 @@ class App extends Component {
         playlistName: event.target.value 
           })
     }
-    // Using code from authorization_code/public/index.html
-    // (https://github.com/spotify/web-api-auth-examples)
-    // Extracts token params from hash string of the URL into an object with key-value pairs.
-    getHashParams() {
-      var hashParams = {};
-      var e, r = /([^&;=]+)=?([^&;]*)/g,
-          q = window.location.hash.substring(1);
-      e = r.exec(q)
-      while (e) {
-         hashParams[e[1]] = decodeURIComponent(e[2]);
-         e = r.exec(q);
-      }
-      //console.log(hashParams)
-      
-      return hashParams;
-    }
-
-    getUrlVars() {
-      var vars = {};
-      var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-          vars[key] = value;
-      });
-      return vars;
-  }
-
-  getUrlParams() {
-    var url_string = window.location.href;
-    var url = new URL(url_string);
-    var c = url.searchParams.get("#access_token");
-    console.log("testy: " + c);
-    return c;
-  }
   
   getUrlParams2( prop ) {
     var params = {};
@@ -136,15 +100,12 @@ class App extends Component {
     return ( prop && prop in params ) ? params[ prop ] : params;
 }
 
-getID(data) {
-  console.log("get data funtion: " + data);
-}
 
     // Request API data
     // Using library provided by JMPerez/spotify-web-api-js
     // (https://github.com/JMPerez/spotify-web-api-js)
     getConnectedAccount() {
-        var user = spotifyApi.getMe()
+        spotifyApi.getMe()
             .then((response) => {
                 this.setState( {
                     spotifyAccount: {
@@ -153,44 +114,14 @@ getID(data) {
 						            Id: response.id
                     }
                 });
-                //console.log("id check again: " + response.Id;//response.json().then(data =>data.id));
             })
             var token = this.getUrlParams2("access_token");
-        //var user = spotifyApi.getMe();
-        //var id = spotifyApi.getMe().then((response) => {this.state return this.state.spotifyAccount.Id};
-       // console.log("user id gc: " + spotifyApi.getMe().then(response=> response.json()).then(data=> console.log(data))); // => {spotifyAccount.Id})); //this.state.spotifyAccount.Id
-            /*var id = fetch('https://api.spotify.com/v1/me', {
-              headers: {'Authorization':'Bearer ' + token}
-            }).then(response => response.json())
-            .then(data=>this.setState({spotifyAccount: id}));
-            //.then(data => data.id));//
-            var idc=fetch('https://api.spotify.com/v1/me', {
-              headers: {'Authorization': 'Bearer ' + token}
-            }).id;
-            console.log("id2: " + fetch('https://api.spotify.com/v1/me', {
-              headers: {'Authorization': 'Bearer ' + token}
-            }).id);
-            console.log("ID IDIDIDI: " + idc); //spotifyApi.getMe().then((response) => {this.setState( { SpotifyAccount: { Id: response.id }});));
-            console.log("im in get connectedd id: "+ mainid); */
-            var token = this.getUrlParams2("access_token");
-            //var testy = '';
-            fetch('https://api.spotify.com/v1/me', {headers: {'Authorization':'Bearer ' + token}})
-            .then(response => response.json())
-            .then(data => this.print(data.id));
-           // console.log("testy: " + testy);
+
            spotifyApi.setAccessToken(token);
-           // var token = this.getUrlParams2("access_token");
-            fetch('https://api.spotify.com/v1/me', {headers: {'Authorization':'Bearer ' + token}})
-            .then(response => response.json())
-            .then(data =>console.log("but this works: " + data.id));
+
     }
 
-    print(word) { 
-      console.log("print func: " + word);
-      //this.props.spotifyAccount.Id = word;
-      console.log("print props func: " + this.props.spotifyAccount.Id);
-    }
-    joinRoom() {
+    /*joinRoom() {
 
           var x = document.getElementById("joinroom");
           var text = "";
@@ -200,7 +131,7 @@ getID(data) {
           //check if its a legal inputted code (4 capital characters)
           if(this.state.value.length == 4){
             //check if the database has the inputted code
-            if(false/* inDatabase(this.state.value.toUpperCase()*/){
+            if(false/* inDatabase(this.state.value.toUpperCase()){
               //if the database has that code, display the corresponding playlist
               //enter room
             }
@@ -213,7 +144,7 @@ getID(data) {
             alert(this.state.value.toUpperCase() + " is an invalid room code. \nRoom codes are 4 characters long.")
           }
     
-  }
+  }*/
 
   makeid(length) {
     var text = "";
@@ -233,136 +164,86 @@ getID(data) {
   createRoom() {
     if (this.state.loggedIn) {
         this.setState( {
-          roomCode: this.makeid(4),
+          //roomCode: this.makeid(4),
           playlistName: this.state.value
         })
 
         var x = document.getElementById("createroom");
         var playlistname = "";
         playlistname = x.elements[0].value;
-        var roomcode = this.makeid(4)
-        console.log("playlistname: " + playlistname);
-        console.log("room code: " + roomcode)
         var token = this.getUrlParams2("access_token");
         fetch('https://api.spotify.com/v1/me', {headers: {'Authorization':'Bearer ' + token}})
             .then(response => response.json())
             .then(data => this.createNewPlaylistHelper(data.id,playlistname));
-        console.log("hi imback here!");
-        //var playlist = this.createNewPlaylistHelper();
-        //var url = window.location.href;// + 
-        //enter room
-        //Spotify calls: makeplaylist(playlistname)
-        //save to database the room code, spotify access token, playlist name
-        //display the playlist
-        var token = this.getUrlParams2("access_token");
-        console.log("token create room: " + token);
+        console.log("back in createRoom()");
         spotifyApi.setAccessToken(token);
-        console.log("create room user id: " + this.state.spotifyAccount.Id)
-        console.log("im in get create room id: "+ mainid); 
       }
     else {
         //get room code input
         //enter room
         alert("You need to connect to Spotify before you can create a room.");
-        var token2 = this.getUrlParams("access_token");
-        var token = this.getUrlParams2("access_token");
-        console.log("token create room: " + token);
-        spotifyApi.setAccessToken(token);
-        console.log("create room user id: " + spotifyApi.getMe().id)
-        var x = document.getElementById("createroom");
-        var playlistname = "";
-        playlistname = x.elements[0].value;
-        var roomcode = this.makeid(4)
-        console.log("playlistname: " + playlistname);
-        console.log("room code: " + roomcode)
-        //this shouldn't create a code. I only have it here for testing purposes. 
-        //if its not logged in they shouldny be able to make a room
     }
 }
 
-/*createlink() { 
-  //var code = makeid(4);
-  console.log("test")
-  var url = window.location.href;// + code;
-  var element = document.getElementById('YOUR_ID');
-  element.setAttribute("href",url)
-  return code;
-}*/
-/*function Create(callback) {
-  var playlistIDState = false;
-  return { 
-    getplaylistIDState  : function()  { return playlistIDState; },
-    setplaylistIDState  : function(p) { playlistIDState = p; callback(playlistIDState, isRunning); },
-  };
-}*/
 
+//Callback function thats called when after spotify API runs getPlaylistTracks()
+//error is an error object, null if no error
+//value is the value if the request succeeded 
+//This prints the total tracks, adds the tracks to the tracks array, and prints them
+getPlaylistTracksCallback(error, value) {
+  console.log("error: " + error);
+  console.log("in the callback...totala: "+ value.total);
+  var total = value.total;
+  console.log("total assigned: "+ total);
+  var i;
+  for(i=0; i<value.total; i++) {
+    tracks.push(value.items[i].track.name); //name of the track
+    console.log("track: " + tracks[i]);
+    //console.log("track " + i + value.items[i].track.name);
+  } 
+}
 
-async createNewPlaylistCallback(error, value) {
-  //console.log("playlist callbacK");
-    //var playlistID = value.id;
-    //var url = window.location.href + "?x=" + playlistID;
-   // console.log("playlist ID from callback: " + playlistID);
-  /* var playlistID = value.id;
-    var url = window.location.href + "?x=" + playlistID;
-    console.log("playlist ID from callbak: " + playlistID);
-  if(error!=null) {
-    //get the playlist ID
-    */
-   var playlistID;
+//this calls getPlaylistTracks given the playlist ID
+getPlaylistHelper(playlistID) {
+  console.log("getting playlist..." + playlistID);
+  var token = this.getUrlParams2("access_token");
+  spotifyApi.setAccessToken(token);
+  spotifyApi.getPlaylistTracks(playlistID,this.getPlaylistTracksCallback);
+}
+
+//Callback function thats called when after spotify API runs createPlaylist()
+//error is an error object, null if no error
+//value is the value if the request succeeded 
+//adds the playlist id as a url parameter 
+//calls getPlaylistHelper() after getting the playlist id
+createNewPlaylistCallback(error, value) {
+
    console.log("2error: "+error);
-   playlistID = value.id;
-   console.log("2value: "+value.id);
+   var playlistID = value.id;
+ 
+   console.log("playilstID: " + playlistID);
    var url = window.location.href + "&playlist_id=" + playlistID;
    console.log("2URL TO SHARE: " + url);
-   //this.buildURL(playlistID);
-   await window.location.assign(url);
+   this.getPlaylistHelper(playlistID);
+
+   window.location.assign(url);
    window.location.href = url;
+
    var idcheck = this.getUrlParams2("playlist_id");
    console.log("playlist id from params: " + idcheck);
-   return playlistID;
+   
+   //return playlistID;
   }
 
 
-buildURL(playlistID) {
-  var url = window.location.href + "?x=" + playlistID;
-  console.log("URL TO SHARE: " + url);
+//id is the user id, playlist name is what the user inputs as the name
+//calls createPlaylist() from the spotify api
+//has createNewPlaylistCallback as callback function
+createNewPlaylist(id, playlistname)	{
+  //var playlistID;
+spotifyApi.createPlaylist(id,{name:playlistname},this.createNewPlaylistCallback);
 }
 
-async createNewPlaylist(id, playlistname)	{
-  var playlistID;
-  /*var playlistObject = spotifyApi.createPlaylist(id,{name:playlistname},function(error, value)
-    {console.log("error: "+error);
-    playlistID = value.id;
-    console.log("value: "+value.id);
-    var url = window.location.href + "&x=" + playlistID;
-console.log("URL TO SHARE: " + url);
-window.location.assign(url);
-
-//this.App.buildURL(playlistID);
-return playlistID;});*/
-var error;
-var value;
-spotifyApi.createPlaylist(id,{name:playlistname},await this.createNewPlaylistCallback);
-    /*.then((response) => {
-      this.setState( {
-        newPlaylist: {
-          name: response.name,
-          snId: response.snapshot_id,
-          tracks: response.tracks.items
-        }
-      });
-    })*/
-    //console.log("playlist object: " + playlistObject);
-    console.log("playlist id: " + playlistID);
-    var url = window.location.href + "&x=" + playlistID;
-    console.log("URL TO SHARE: " + url);
-    /*spotifyApi.createPlaylist(id,{name:playlistname},this.createNewPlaylistCallback())
-    .then(response => response.json())
-            .then(data => console.log("two: " + data.id));
-   var playlistID = playlistObject.id; */
-    
-   //console.log("playlist ID not from callback: " + playlistID);
-}
 
 
 	
@@ -410,8 +291,8 @@ spotifyApi.createPlaylist(id,{name:playlistname},await this.createNewPlaylistCal
 
     // Display our data
     render() {
-      mainid = this.props.id;
-      console.log("im in render: " + mainid);
+      //mainid = this.props.id;
+      //console.log("im in render: " + mainid);
         return (
           <div className="App">
             <h1 class="cover-heading">DJFY</h1>
