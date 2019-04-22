@@ -13,15 +13,15 @@ urlListener(event => {
 
 var spotifyApi = new SpotifyWebApi();
 var tracks = [];
-var listTracks = tracks.map((tracks) =>
-  <li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button>{tracks}</li>
-);
+var listTracks; //= tracks.map((tracks) =>
+  //<li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button>{tracks}</li>
+//);
 
 //var snapshot = '';
 //var currentTrack = '';
 //var mainid = '';
 
-
+var hereIsThis = this;
 
 class App extends Component {
 
@@ -70,6 +70,8 @@ class App extends Component {
           this.getTrack = this.getTrack.bind(this);
           this.addTracks = this.addTracks.bind(this);
           this.removeTracks = this.removeTracks.bind(this);
+          this.render = this.render.bind(this);
+          //this.forceUpdate = this.forceUpdate.bind(this);
       }
     
 
@@ -146,13 +148,13 @@ class App extends Component {
     
   }*/
 
-  makeid(length) {
+  /*makeid(length) {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
      for (var i = 0; i < length; i++)
        text += possible.charAt(Math.floor(Math.random() * possible.length));
      return text;
-   }
+   }*/
 
   async createNewPlaylistHelper(id, name) {
     console.log("helper id: "+ id);
@@ -201,11 +203,20 @@ getPlaylistTracksCallback(error, value) {
     console.log("track: " + tracks[i]);
     //console.log("track " + i + value.items[i].track.name);
   } 
+  listTracks = tracks.map((tracks) =>
+  <li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button>{tracks}</li>
+);
+
+hereIsThis.forceUpdate();
+//this.setState({listTracks});
+ // this.render().bind(this);
+ //ReactDOM.render();
 }
 
 //this calls getPlaylistTracks given the playlist ID
 getPlaylistHelper(playlistID) {
   console.log("getting playlist..." + playlistID);
+  hereIsThis = this;
   var token = this.getUrlParams2("access_token");
   spotifyApi.setAccessToken(token);
   spotifyApi.getPlaylistTracks(playlistID,this.getPlaylistTracksCallback);
@@ -241,12 +252,9 @@ createNewPlaylistCallback(error, value) {
 //has createNewPlaylistCallback as callback function
 createNewPlaylist(id, playlistname)	{
   //var playlistID;
-spotifyApi.createPlaylist(id,{name:playlistname},this.createNewPlaylistCallback);
+  spotifyApi.createPlaylist(id,{name:playlistname},this.createNewPlaylistCallback);
 }
 
-
-
-	
 	search(q) {
 		spotifyApi.search(q, 'track')
 		.then((response) => {
@@ -360,7 +368,7 @@ spotifyApi.createPlaylist(id,{name:playlistname},this.createNewPlaylistCallback)
             </form>
               
                   <br/> <br/>
-                  {listTracks}
+                  {listTracks} {console.log("listed")}
             </ul> 
 
           </div>
