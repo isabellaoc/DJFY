@@ -16,7 +16,7 @@ var tracks = [];
 var listTracks; //= tracks.map((tracks) =>
   //<li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button>{tracks}</li>
 //);
-
+var trackToggle;
 //var snapshot = '';
 //var currentTrack = '';
 //var mainid = '';
@@ -199,12 +199,14 @@ getPlaylistTracksCallback(error, value) {
   console.log("total assigned: "+ total);
   var i;
   for(i=0; i<value.total; i++) {
-    tracks.push(value.items[i].track.name); //name of the track
+    tracks.push(value.items[i].track); //name of the track
     console.log("track: " + tracks[i]);
     //console.log("track " + i + value.items[i].track.name);
-  } 
-  listTracks = tracks.map((tracks) =>
-  <li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button>{tracks}</li>
+  }  //
+  //displays all the tracks, the corresponding buttons will call getSNIDtoremoveTracks(trackURI)
+  //set the button id to the uri of the track. this is so when we do e.target.id, itll actually be passing in the track.uri
+  listTracks = tracks.map((tracks) => 
+  <li key={tracks.id}><button id= {tracks.uri} onClick={e => hereIsThis.getSNIDtoremoveTracks(e.target.id)} style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button>{tracks.name}</li>
 );
 
 hereIsThis.forceUpdate();
@@ -253,6 +255,7 @@ createNewPlaylistCallback(error, value) {
 createNewPlaylist(id, playlistname)	{
   //var playlistID;
   spotifyApi.createPlaylist(id,{name:playlistname},this.createNewPlaylistCallback);
+  //console.log("left createNewPlaylist");
 }
 
 	search(q) {
@@ -284,10 +287,38 @@ createNewPlaylist(id, playlistname)	{
 					snId: response.snapshot_id
 				});
 			})
-	}
-	
+  }
+  
+  //gets the snid so it can remove tracks
+  getSNIDtoremoveTracks(trackURI) {
+    trackToggle =trackURI;
+    var playlistID = this.getUrlParams2("playlist_id");
+    //this.getPlaylistHelper(playlistID)
+    spotifyApi.getPlaylist(playlistID, this.SNIDtoRemoveCallback );
+  }
+
+  //callback to getPlaylist for the snid. it takes the snid and then actually tries to remove the song now
+  SNIDtoRemoveCallback(error, value) {
+    var snid = value.snapshot_id;
+    console.log("snid: " + snid);
+    //var position = tracks.indexOf() can add in later
+    var playlistID = hereIsThis.getUrlParams2("playlist_id");
+    spotifyApi.removeTracksFromPlaylistWithSnapshotId(playlistID,[trackToggle], snid, hereIsThis.removeTrackWithSnidCallback);
+  }
+
+  removeTrackWithSnidCallback(error, value) {
+    console.log("well...that song should be removed:" + value.name);
+    var playlistID = hereIsThis.getUrlParams2("playlist_id");
+    hereIsThis.getPlaylistHelper(playlistID)
+    //hereIsThis.forceUpdate();
+    window.location.reload();
+  }
+  
+  //i dont think I need this function
 	removeTracks(snId) {
-		var uri = this.state.getTrack.newTrack
+    var playlistID = this.getUrlParams2("playlist_id");
+    //spotifyApi.getPlaylist(playlistID, {snapshot_id}, 
+    var uri;
 		spotifyApi.removeTracksFromPlaylistWithSnapshotId(snId, uri)
 			.then((response) => {
 				this.setState( {
