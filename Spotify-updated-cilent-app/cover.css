@@ -1,0 +1,35 @@
+/*.room, .leads .:*/
+.modaly {
+  background:rgb(27, 25, 25);
+  overflow-y:auto;
+}
+
+li {
+  list-style-type: none;
+  padding: 5px;
+}
+
+.ReactModalPortal {
+  color: #282c34;
+  background-color: #282c34;
+}
+
+.ReactModalPortal__Overlay {
+  color: #282c34;
+  background-color: #282c34;
+}
+
+.ReactModal__Overlay--after-open {
+  color: #282c34;
+  background-color: #282c34;
+}
+
+.ReactModal__Content {
+  color: #282c34;
+  background-color: #282c34;
+}
+
+.ReactModal__Content--after-open {
+  color: #282c34;
+  background-color: #282c34;
+}

@@ -25,7 +25,17 @@ var trackToggle;
 //var snapshot = '';
 //var currentTrack = '';
 //var mainid = '';
-
+const customStyles = {
+  content : {
+    top                   : '50%',
+    left                  : '50%',
+    right                 : 'auto',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+    transform             : 'translate(-50%, -50%)',
+    background: '#282c34',
+  }
+};
 var hereIsThis = this;
 Modal.setAppElement(document.getElementById('app'));
 class App extends Component {
@@ -80,6 +90,7 @@ class App extends Component {
           this.openModal = this.openModal.bind(this);
           this.afterOpenModal = this.afterOpenModal.bind(this);
           this.closeModal = this.closeModal.bind(this);
+          this.addTracksCallBack = this.addTracksCallBack.bind(this);
           //this.forceUpdate = this.forceUpdate.bind(this);
       }
     
@@ -89,11 +100,12 @@ class App extends Component {
      
       afterOpenModal() {
         // references are now sync'd and can be accessed.
-        this.subtitle.style.color = '#f00';
+        //this.subtitle.style.color = '#f00';
       }
      
       closeModal() {
         this.setState({modalIsOpen: false});
+        window.location.reload();
       }
 
     handleChange(event) {
@@ -227,7 +239,7 @@ getPlaylistTracksCallback(error, value) {
   //displays all the tracks, the corresponding buttons will call getSNIDtoremoveTracks(trackURI)
   //set the button id to the uri of the track. this is so when we do e.target.id, itll actually be passing in the track.uri
   listTracks = tracks.map((tracks) => 
-  <li key={tracks.id}><button id= {tracks.uri} onClick={e => hereIsThis.getSNIDtoremoveTracks(e.target.id)} style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button>{tracks.name}</li>
+  <li key={tracks.id}><button id= {tracks.uri} onClick={e => hereIsThis.getSNIDtoremoveTracks(e.target.id)} class="btn btn-danger"> - </button> {tracks.name} by {tracks.artists[0].name}</li>
 );
 
 hereIsThis.forceUpdate();
@@ -300,16 +312,32 @@ createNewPlaylist(id, playlistname)	{
 			})
 	}
 	
-	addTracks(snId) {
-		var uri = this.state.getTrack.newTrack
+	addTracks(uri) {
+    console.log("this is being removed..." + uri);
+    var playlistID = this.getUrlParams2("playlist_id");
+    var token = this.getUrlParams2("access_token");
+    spotifyApi.setAccessToken(token);
+    //spotifyApi.addTracksToPlaylist(playlistID, [uri], this.addTracksCallBack);
+    spotifyApi.addTracksToPlaylist(playlistID, [uri])
+    .then(function(data) {
+      console.log('Search by "Love"', data);
+    }, function(err) {
+      console.error(err);
+    });
+    /*var uri = this.state.getTrack.newTrack
 		spotifyApi.addTracksToPlaylist(snId, uri)
 			.then((response) => {
 				this.setState( {
 					snId: response.snapshot_id
 				});
-			})
+			})*/
   }
   
+  addTracksCallBack(error, value) {
+    console.log("error" + error);
+    console.log("track added... " + value);
+  }
+
   //gets the snid so it can remove tracks
   getSNIDtoremoveTracks(trackURI) {
     trackToggle =trackURI;
@@ -347,13 +375,13 @@ createNewPlaylist(id, playlistname)	{
 				});
 			})
   }
-  searchHelper(error,value){
+  searchHelper(value){
     console.log("in search helper");
     //console.log("search results: " + items);
     var i =0;
-    console.log("error: " + error);
+    //console.log("error: " + error);
     console.log("value: " + typeof value);
-    console.log("total: " + value.href);
+    console.log("total: " + value.total);
     for(i=0; i<value.total; i++) {
       searchTracks.push(value.items[i].track); //name of the track
       console.log("track: " + tracks[i]);
@@ -361,7 +389,7 @@ createNewPlaylist(id, playlistname)	{
     }  //
     //var i = items;
     listSearchTracks = searchTracks.map((searchTracks) =>
-      <li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button>{i.name}</li>
+      <li><button id= {searchTracks.uri} onClick={e => hereIsThis.addTracks(e.target.id)} class="btn btn-success">-</button>{i.name}</li>
     );
     this.openModal();
   }
@@ -374,6 +402,7 @@ createNewPlaylist(id, playlistname)	{
     console.log("query: " + query);
     var token = this.getUrlParams2("access_token");
     spotifyApi.setAccessToken(token);
+    var alsoThis = this;
 	//	var token = this.getUrlParams2("access_token");
         /*fetch('https://api.spotify.com/v1/search?q={query}&type=track}', {headers: {'Authorization':'Bearer ' + token}})
             .then(response => response.json())
@@ -383,13 +412,30 @@ createNewPlaylist(id, playlistname)	{
         /*fetch('https://api.spotify.com/v1/search', {headers: {'Authorization':'Bearer ' + token}})
             .then(response => response.json())
             .then(data => spotifyApi.searchTracks('Mr. Brightside', this.searchHelper));*/
-  /*spotifyApi.searchTracks('Love')
+  spotifyApi.searchTracks('Love')
   .then(function(data) {
     console.log('Search by "Love"', data);
   }, function(err) {
     console.error(err);
-  });*/
-    spotifyApi.searchTracks(query, this.searchHelper);
+  });
+    spotifyApi.searchTracks(query) .then(function(data) {
+      var i=0;
+      console.log("total: " + data.tracks.total);
+    for(i=0; i<20; i++) {
+      console.log("func call " + i);
+      searchTracks.push(data.tracks.items[i]); //name of the track
+      console.log("track: " + data.tracks.items[i].name);
+      //console.log("track " + i + value.items[i].track.name);
+    }  //
+    //var i = items;
+    listSearchTracks = searchTracks.map((searchTracks) =>
+      <li><button id= {searchTracks.uri} onClick={e => alsoThis.addTracks(e.target.id)} class="btn btn-success">+</button>{searchTracks.name} by {searchTracks.artists[0].name}</li>
+    );
+    console.log("everything added in search");
+    alsoThis.openModal();
+    }, function(err) {
+      console.error(err);
+    });
     console.log("leaving search");
 }
   
@@ -398,30 +444,25 @@ createNewPlaylist(id, playlistname)	{
     // Display our data
     render() {
       //mainid = this.props.id;
+      var alsoThis = this;
       console.log("im in render: ");
         return (
           <div id="app" className="App">
             <h1 class="cover-heading">DJFY</h1>
             <div class="row">
-              {/*<Modal
+              <Modal
+              
                 isOpen={this.state.modalIsOpen}
                 onAfterOpen={this.afterOpenModal}
                 onRequestClose={this.closeModal}
-                /*style={customStyles}
+                style={customStyles}
+                style="overflow-y: scroll; background: #282c34;"
                 contentLabel="Example Modal">
-
-                <h2 ref={subtitle => this.subtitle = subtitle}>Hello</h2>
+                <button class="pull-right btn btn-sm btn-primary" onClick={this.closeModal}>close</button>
+                {/*<h2 ref={subtitle => this.subtitle = subtitle}>Hello</h2>*/}
                 {listSearchTracks} {console.log("search listed")}
-                <button onClick={this.closeModal}>close</button>
-                <div>I am a modal</div>
-                <form>
-                  <input />
-                  <button>tab navigation</button>
-                  <button>stays</button>
-                  <button>inside</button>
-                  <button>the modal</button>
-                </form>
-              </Modal>*/}
+                
+              </Modal>
               <div class="create col-sm-12">
                 Spotify Account: {this.state.spotifyAccount.accountName}
                 <img  src={this.state.spotifyAccount.accountPic} style={{ height: 100 }}/>
@@ -440,21 +481,20 @@ createNewPlaylist(id, playlistname)	{
                         <a>NAME PLAYLIST:</a>
                       </p>
                       <input  type = 'text' onChange={this.handleChange} />
-                      <br/>
                 </form> 
                 <p class="lead">
-                  {/*<a id="YOUR_ID" className={this.state.isCreated ? 'box focused' : 'box'}  onClick={() => this.createRoom()} class="btn btn-lg btn-secondary">{React.cloneElement(document.getElementById('app'), {
-                    onClick: _ => this.setState({isCreated: true}),})}CREATE ROOM</a>*/}
+                  <a id="YOUR_ID" className={this.state.isCreated ? 'box focused' : 'box'}  onClick={() => this.createRoom()} class="btn btn-lg btn-secondary">{/*React.cloneElement(alsoThis.props.children, {
+                    onClick: _ => this.setState({isCreated: true}),})*/}CREATE ROOM</a>
                 </p>
               </div>
             </div> {/* Closing div for first row */}
             <div class="row">
               <div class="room col-sm-12">
-                <ul align = "left">
+                <ul>
                 <h2>{this.state.playlistName}</h2>
                 <form id ="searcht">
                   <label>
-                    Search:
+                    
                     <input  type = 'text' />
                   </label>
                   {/*<input onClick={() => this.search} value="Search" />*/}
