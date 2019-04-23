@@ -2,97 +2,93 @@ import React, { Component } from 'react';
 import './css/bootstrap.css';
 
 import SpotifyWebApi from 'spotify-web-api-js';
-const spotifyApi = new SpotifyWebApi();
+//import url from 'url-parameters';
 
-var tracks = [''];
-var listItems = tracks.map((tracks) =>
-  <li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button>{tracks.name}</li>
-);
+const urlListener = require('url-listener')
+ 
+urlListener(event => {
+  // your logic here!
+  console.log('URL UPDATED!')
+})
 
-var snapshot = '';
-var currentTrack = '';
+var spotifyApi = new SpotifyWebApi();
+var tracks = [];
+var listTracks; //= tracks.map((tracks) =>
+  //<li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button>{tracks}</li>
+//);
+var trackToggle;
+
+var searchresults = [];
+
+var hereIsThis = this;
 
 class App extends Component {
+
+  //This checks if there is a playlist ID currently in the URL
+  //this is for the guest users that have the shared link
+  //it should immediately print the playlist tracks/info 
+   isTherePlaylistID() {
+    var idCheck = this.getUrlParams2("playlist_id");
+    if(idCheck && idCheck.length >2) {
+      console.log("WE HAVE A PLAYLIST ID IN THE URL: " + idCheck);
+      this.getPlaylistHelper(idCheck);
+
+    }
+  }
     // Get access token to be able to fetch data from the Spotify API
-    constructor() {
-      super();
-      const params = this.getHashParams();
+    constructor(props) {
+      super(props);
       const token = this.getUrlParams2("access_token");
+      console.log("token: " + token);
       if (token) {
-		  console.log("setting token...");
+        console.log("setting token...");
           spotifyApi.setAccessToken(token);
       }
+      this.isTherePlaylistID();
       this.state = {
           loggedIn: token ? true : false,
-          spotifyAccount: {accountName: 'Not Logged In', accountPic: ''},
+          spotifyAccount: {accountName: 'Not Logged In', accountPic: '', Id: ''},
           
-		  playlistName:'',
-	      roomCode: '',
-		  value: ''
+          playlistName:'',
+          roomCode: '',
+          value: '',
+		  query: ''
+		  
           };
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSearch = this.handleSearch.bind(this);
-
-		this.getHashParams = this.getHashParams.bind(this);	
-		this.createRoom = this.createRoom.bind(this);
-        this.getConnectedAccount = this.getConnectedAccount.bind(this);
-        this.createNewPlaylist = this.createNewPlaylist.bind(this);
-        this.search = this.search.bind(this);
-        this.getTrack = this.getTrack.bind(this);
-        this.addTracks = this.addTracks.bind(this);
-        this.removeTracks = this.removeTracks.bind(this);
+          
+          this.handleChange = this.handleChange.bind(this);
+          this.handleSearch = this.handleSearch.bind(this);
+        
+          //this.getHashParams = this.getHashParams.bind(this);
+          this.getConnectedAccount = this.getConnectedAccount.bind(this);
+          this.createNewPlaylist = this.createNewPlaylist.bind(this);
+          this.createNewPlaylistCallback = this.createNewPlaylistCallback.bind(this);
+          this.createNewPlaylistHelper = this.createNewPlaylistHelper.bind(this);
+          this.getPlaylistHelper = this.getPlaylistHelper.bind(this);
+          this.getPlaylistTracksCallback = this.getPlaylistTracksCallback.bind(this);
+          this.search = this.search.bind(this);
+          this.getTrack = this.getTrack.bind(this);
+          this.addTracks = this.addTracks.bind(this);
+          this.removeTracks = this.removeTracks.bind(this);
+          this.render = this.render.bind(this);
+          //this.forceUpdate = this.forceUpdate.bind(this);
       }
+    
 
     handleChange(event) {
-        this.setState({search: event.target.value});
+        this.setState({value: event.target.value});
       }
-
+    
     handleSearch(event) {
-        alert(this.search.value);
-        event.preventDefault();
+        this.search(this.state.query);
     }
-
+    
     changePlaylistName = (event) =>  {
         this.setState({
         playlistName: event.target.value 
-        })
+          })
     }
-
-    // Using code from authorization_code/public/index.html
-    // (https://github.com/spotify/web-api-auth-examples)
-    // Extracts token params from hash string of the URL into an object with key-value pairs.
-    getHashParams() {
-      var hashParams = {};
-      var e, r = /([^&;=]+)=?([^&;]*)/g,
-          q = window.location.hash.substring(1);
-      e = r.exec(q)
-      while (e) {
-         hashParams[e[1]] = decodeURIComponent(e[2]);
-         e = r.exec(q);
-      }
-      return hashParams;
-    }
-	
-	 getUrlVars() {
-      var vars = {};
-      var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-          vars[key] = value;
-      });
-      return vars;
-  }
-
-
-
-  getUrlParams() {
-    var url_string = window.location.href;
-    var url = new URL(url_string);
-    var c = url.searchParams.get("#access_token");
-
-    console.log("testy: " + c);
-
-    return c;
-  } 
-
+  
   getUrlParams2( prop ) {
     var params = {};
     var search = decodeURIComponent( window.location.href.slice( window.location.href.indexOf( '#' ) + 1 ) );
@@ -104,8 +100,8 @@ class App extends Component {
     } );
 
     return ( prop && prop in params ) ? params[ prop ] : params;
-  }
-	
+}
+
     // Request API data
     // Using library provided by JMPerez/spotify-web-api-js
     // (https://github.com/JMPerez/spotify-web-api-js)
@@ -116,187 +112,193 @@ class App extends Component {
                     spotifyAccount: {
                         accountName: response.display_name,
                         accountPic: response.images[0].url,
-						Id: response.id
+						            Id: response.id
                     }
                 });
             })
+            var token = this.getUrlParams2("access_token");
+
+           spotifyApi.setAccessToken(token);
+
     }
 
-  //makeid(length) {
-    //var text = "";
-    //var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-     //for (var i = 0; i < length; i++)
-       //text += possible.charAt(Math.floor(Math.random() * possible.length));
-     //return text;
-   //}
+  async createNewPlaylistHelper(id, name) {
+    console.log("helper id: "+ id);
+    await this.createNewPlaylist(id, name);
+    var playlistID = this.getUrlParams2("x");
+    console.log("here is the playlist ID: "+ playlistID);
+  }
 
-  createRoom(id) {
+  createRoom() {
     if (this.state.loggedIn) {
-        //enters playlist name
-		var playlistName = ''
         this.setState( {
-          roomCode: window.location.href,
-          playlistName: 'Name that is entered'
+          //roomCode: this.makeid(4),
+          playlistName: this.state.value
         })
-        //enter room
-		this.createNewPlaylist(id, playlistName);
 
         var x = document.getElementById("createroom");
         var playlistname = "";
         playlistname = x.elements[0].value;
-        var roomcode = window.location.href;
-        console.log("playlistname: " + playlistname);
-        console.log("room code: " + roomcode);
-		this.createNewPlaylist();
-		//var url = window.location.href;// + 
-        //enter room
-        //Spotify calls: makeplaylist(playlistname)
-        //save to database the room code, spotify access token, playlist name
-        //display the playlist
         var token = this.getUrlParams2("access_token");
-        console.log("token create room: " + token);
+        fetch('https://api.spotify.com/v1/me', {headers: {'Authorization':'Bearer ' + token}})
+            .then(response => response.json())
+            .then(data => this.createNewPlaylistHelper(data.id,playlistname));
+        console.log("back in createRoom()");
         spotifyApi.setAccessToken(token);
-        console.log("create room user id: " + spotifyApi.getMe().id)
       }
-
     else {
         //get room code input
         //enter room
         alert("You need to connect to Spotify before you can create a room.");
-        var token2 = this.getUrlParams("access_token");
-        var token = this.getUrlParams2("access_token");
-        console.log("token create room: " + token);
-        spotifyApi.setAccessToken(token);
-        console.log("create room user id: " + spotifyApi.getMe().id)
-        var x = document.getElementById("createroom");
-        var playlistname = "";
-        playlistname = x.elements[0].value;
-        var roomcode = this.makeid(4)
-        console.log("playlistname: " + playlistname);
-        console.log("room code: " + roomcode)
-        //this shouldn't create a code. I only have it here for testing purposes. 
-        //if its not logged in they shouldny be able to make a room
     }
 }
 
-createNewPlaylistCallback(error, value) {
-  //console.log("playlist callbacK");
-    //var playlistID = value.id;
-    //var url = window.location.href + "?x=" + playlistID;
-   // console.log("playlist ID from callback: " + playlistID);
-  if(error!=null) {
-    //get the playlist ID
-    var playlistID = value.id;
-    var url = window.location.href + "?x=" + playlistID;
-    console.log("playlist ID: " + playlistID);
-  }
+
+//Callback function thats called when after spotify API runs getPlaylistTracks()
+//error is an error object, null if no error
+//value is the value if the request succeeded 
+//This prints the total tracks, adds the tracks to the tracks array, and prints them
+getPlaylistTracksCallback(error, value) {
+  console.log("error: " + error);
+  console.log("in the callback...totala: "+ value.total);
+  var total = value.total;
+  console.log("total assigned: "+ total);
+  var i;
+  for(i=0; i<value.total; i++) {
+    tracks.push(value.items[i].track.name); //name of the track
+    console.log("track: " + tracks[i]);
+    //console.log("track " + i + value.items[i].track.name);
+  } 
+  listTracks = tracks.map((tracks) =>
+  <li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button>{tracks}</li>
+);
+
+hereIsThis.forceUpdate();
+//this.setState({listTracks});
+ // this.render().bind(this);
+ //ReactDOM.render();
 }
 
+//this calls getPlaylistTracks given the playlist ID
+getPlaylistHelper(playlistID) {
+  console.log("getting playlist..." + playlistID);
+  hereIsThis = this;
+  var token = this.getUrlParams2("access_token");
+  spotifyApi.setAccessToken(token);
+  spotifyApi.getPlaylistTracks(playlistID,this.getPlaylistTracksCallback);
+}
 
-/*createlink() { 
-  var code = makeid(4);
-  console.log("test")
-  var url = "playlist.html?x=" + code;
-  var element = document.getElementById('YOUR_ID');
-  element.setAttribute("href",url)
-  return code;
-}*/
+//Callback function thats called when after spotify API runs createPlaylist()
+//error is an error object, null if no error
+//value is the value if the request succeeded 
+//adds the playlist id as a url parameter 
+//calls getPlaylistHelper() after getting the playlist id
+createNewPlaylistCallback(error, value) {
 
-	createNewPlaylist(id, n)	{
-		var snId = '';
-		var playlistObject = spotifyApi.createPlaylist(id,null,this.createNewPlaylistCallback())
-			.then((response) => {
-				this.setState( {
-					newPlaylist: {
-						name: response.name,
-						//snapshot is most up to date version of the playlist its called from
-						snId: response.snapshot_id,
-					}
-				});
-			})
-		snapshot = snId
-		var playlistID = playlistObject.id; 
-		console.log("playlist ID not from callback: " + playlistID)
-			
-		var name = {
-				name: n
-		}
-		spotifyApi.changePlaylistDetails(snId, name)
+   console.log("2error: "+error);
+   var playlistID = value.id;
+ 
+   console.log("playilstID: " + playlistID);
+   var url = window.location.href + "&playlist_id=" + playlistID;
+   console.log("2URL TO SHARE: " + url);
+   this.getPlaylistHelper(playlistID);
+
+   window.location.assign(url);
+   window.location.href = url;
+
+   var idcheck = this.getUrlParams2("playlist_id");
+   console.log("playlist id from params: " + idcheck);
+   
+   //return playlistID;
+  }
+
+
+//id is the user id, playlist name is what the user inputs as the name
+//calls createPlaylist() from the spotify api
+//has createNewPlaylistCallback as callback function
+createNewPlaylist(id, playlistname)	{
+  //var playlistID;
+  spotifyApi.createPlaylist(id,{name:playlistname},this.createNewPlaylistCallback);
+}
+
+	searchHelper(items){
+		console.log("search results: " + items);
+		var i = items;
+		searchresults = i.map((i) =>
+			<li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button>{i.name}</li>
+		);
+		
+	}
+
+	search(query) {
+		console.log("query: " + query);
+		var token = this.getUrlParams2("access_token");
+        fetch('https://api.spotify.com/v1/search?q={query}&type=track}', {headers: {'Authorization':'Bearer ' + token}})
+            .then(response => response.json())
+            .then(data => this.searchHelper(data.items));
+        spotifyApi.setAccessToken(token);
 	}
 	
-	//types.join is a mystery
-	search(q) {
-		spotifyApi.search(q, 'track')
-		.then((response) => {
-			this.setState( {
-				//gets an array of items from within a package object
-				results: response.track.items
-			});
-		})
-		//want to make these clickable so that currentTrack gets the id
-		var list = this.state.results.map((results) =>
-			<li>{this.state.results.name}</li>
-		//currentTrack = 'stores the track id'	
-		//getTrack(currentTrack)	
-		);
-	}
-
-	//traId is the id of the track object, not playlist or user
 	getTrack(traId) {
-		var newTrack = ''
 		spotifyApi.getTrack(traId)
 			.then((response) => {
 				this.setState( {
-					name: response.name,
-					//uri is a resource identifer to locate an artist, album, or track
 					newTrack: response.uri
 				});				
 			})
-		//display name of track
-		currentTrack = newTrack
-		//add track button onClick() => addTracks
-		//first button = addTracks()
-		//second button = removeTracks()
 	}
 	
-	
-	addTracks() {
-		var snId = ''
-		spotifyApi.addTracksToPlaylist(snapshot, currentTrack)
+	addTracks(snId) {
+		var uri = this.state.getTrack.newTrack
+		spotifyApi.addTracksToPlaylist(snId, uri)
 			.then((response) => {
 				this.setState( {
 					snId: response.snapshot_id
 				});
 			})
-		//updates the tracks array everytime a new track is added	
-		//spotifyApi.getPlaylist(snapshot)
-			//.then((response) => {
-				//tracks: response.tracks
-			//});
-		//tracks = tracks
-		snapshot = snId
 	}
+	
+	//gets the snid so it can remove tracks
 
-	removeTracks() {
-		var snId = ''
-		spotifyApi.removeTracksFromPlaylistWithSnapshotId(snapshot, currentTrack)
+  getSNIDtoremoveTracks(trackURI) {
+    trackToggle =trackURI;
+    var playlistID = this.getUrlParams2("playlist_id");
+    //this.getPlaylistHelper(playlistID)
+    spotifyApi.getPlaylist(playlistID, this.SNIDtoRemoveCallback );
+  }
+
+  //callback to getPlaylist for the snid. it takes the snid and then actually tries to remove the song now
+  SNIDtoRemoveCallback(error, value) {
+    var snid = value.snapshot_id;
+    console.log("snid: " + snid);
+    //var position = tracks.indexOf() can add in later
+    var playlistID = hereIsThis.getUrlParams2("playlist_id");
+    spotifyApi.removeTracksFromPlaylistWithSnapshotId(playlistID,[trackToggle], snid, hereIsThis.removeTrackWithSnidCallback);
+  }
+
+  removeTrackWithSnidCallback(error, value) {
+    console.log("well...that song should be removed:" + value.name);
+    var playlistID = hereIsThis.getUrlParams2("playlist_id");
+    hereIsThis.getPlaylistHelper(playlistID)
+    //hereIsThis.forceUpdate();
+    window.location.reload();
+  }
+	
+	removeTracks(snId) {
+		var uri = this.state.getTrack.newTrack
+		spotifyApi.removeTracksFromPlaylistWithSnapshotId(snId, uri)
 			.then((response) => {
 				this.setState( {
 					snId: response.snapshot_id
 				});
 			})
-			//updates when a track is removed
-			//spotifyApi.getPlaylist(snapshot)
-				//.then((response) => {
-					//tracks: response.tracks
-				//});
-			//tracks = tracks
-			snapshot = snId
 	}
+	
 
     // Display our data
     render() {
-		var us = this.state.spotifyAccount
+      //mainid = this.props.id;
+      //console.log("im in render: " + mainid);
         return (
           <div className="App">
             <h1 class="cover-heading">DJFY</h1>
@@ -306,9 +308,9 @@ createNewPlaylistCallback(error, value) {
                   <div class="col-lg-6">
                   </div>
                   <div class="col-lg-6">
-                    Spotify Account: {" "+ this.state.spotifyAccount.accountName + " "}
-					ID: {this.state.spotifyAccount.id}
+                    Spotify Account: {this.state.spotifyAccount.accountName}
                     <img  src={this.state.spotifyAccount.accountPic} style={{ height: 100 }}/>
+                    {/*user id: {this.state.spotifyAccount.Id}*/}
                     <br /> <br /> {/* Show button to check spotify account */}
                   {
                     this.state.loggedIn &&
@@ -322,49 +324,42 @@ createNewPlaylistCallback(error, value) {
                           <p class="lead">
                             <a>NAME PLAYLIST:</a>
                           </p>
-                          <input type="text" name="playlistname"/>
+                          <input  type = 'text' onChange={this.handleChange} />
                           <br/>
                     </form> 
                     <p class="lead">
-                          <a id="YOUR_ID" href="#" onClick={() => this.createRoom(us.id)} class="btn btn-lg btn-secondary">CREATE ROOM	</a>
+                          <a id="YOUR_ID" onClick={() => this.createRoom()} class="btn btn-lg btn-secondary">CREATE ROOM</a>
                     </p>
                   </div>
                 </div>
               </div>
-              <div class="col-sm-6">
-                <div class ="row">
-                  <div class="col-lg-6">
-                    <form id="joinroom"> 
-                      <p class="lead">
-                        <a>ROOM CODE:</a>
-                      </p>
-                      <input type="text" name="roomcode"/>
-                      <br/>
-                    </form>
-                    Join Room
-                    <button class="btn btn-lg btn-secondary" onClick={() => this.createRoom()}>Join</button>
-                  </div>
-                  <div class="col-lg-6">
-                  </div>
-                </div>
-              </div>
+
+              {/*<div class="col-sm-6">
+              </div>*/}
             </div> {/* Closing div for first row */}
-            <h2>{this.state.playlistName} - {this.state.roomCode}</h2>
+            
             <ul align = "left">
-            <h2>{this.state.playlistName}</h2> 
-            <form onSubmit={this.handleSubmit}>
+            <h2>{this.state.playlistName} - {this.state.roomCode}</h2>
+            <form onSubmit={this.handleSearch}>
               <label>
-                Search:
-                <textarea  type = 'text' value={this.state.search} onChange={this.handleChange} />
+                Search: 
+                <input  type = 'text' onChange={this.handleChange} />
               </label>
-              <input type="submit" value="Search" />
+			  {console.log("query: " + this.state.query)}
+              <input type="submit" value="Search" onClick = {() => this.search()}/>
+					
+					<br/><br/>
+				  {searchresults}
             </form>
+              
                   <br/> <br/>
-                  {listItems}
+                  {listTracks} {console.log("listed")}
             </ul> 
+
           </div>
         );
     }
 }
+
 
 export default App;
