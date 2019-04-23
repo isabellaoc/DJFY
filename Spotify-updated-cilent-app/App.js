@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
-import './css/bootstrap.css';
+import ReactDOM from 'react-dom';
+import Modal from 'react-modal';
 
+import './css/bootstrap.css';
+import './css/cover.css';
 import SpotifyWebApi from 'spotify-web-api-js';
 //import url from 'url-parameters';
 
@@ -13,6 +16,8 @@ urlListener(event => {
 
 var spotifyApi = new SpotifyWebApi();
 var tracks = [];
+var searchTracks = [];
+var listSearchTracks;
 var listTracks; //= tracks.map((tracks) =>
   //<li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button>{tracks}</li>
 //);
@@ -22,7 +27,7 @@ var trackToggle;
 //var mainid = '';
 
 var hereIsThis = this;
-
+Modal.setAppElement(document.getElementById('app'));
 class App extends Component {
 
   //This checks if there is a playlist ID currently in the URL
@@ -53,11 +58,11 @@ class App extends Component {
           playlistName:'',
           roomCode: '',
           value: '',
-
+          isCreated: false,
           };
           
           this.handleChange = this.handleChange.bind(this);
-          this.handleSearch = this.handleSearch.bind(this);
+         // this.handleSearch = this.handleSearch.bind(this);
         
           //this.getHashParams = this.getHashParams.bind(this);
           this.getConnectedAccount = this.getConnectedAccount.bind(this);
@@ -67,13 +72,29 @@ class App extends Component {
           this.getPlaylistHelper = this.getPlaylistHelper.bind(this);
           this.getPlaylistTracksCallback = this.getPlaylistTracksCallback.bind(this);
           this.search = this.search.bind(this);
+          this.searchHelper = this.searchHelper.bind(this);
           this.getTrack = this.getTrack.bind(this);
           this.addTracks = this.addTracks.bind(this);
           this.removeTracks = this.removeTracks.bind(this);
           this.render = this.render.bind(this);
+          this.openModal = this.openModal.bind(this);
+          this.afterOpenModal = this.afterOpenModal.bind(this);
+          this.closeModal = this.closeModal.bind(this);
           //this.forceUpdate = this.forceUpdate.bind(this);
       }
     
+      openModal() {
+        this.setState({modalIsOpen: true});
+      }
+     
+      afterOpenModal() {
+        // references are now sync'd and can be accessed.
+        this.subtitle.style.color = '#f00';
+      }
+     
+      closeModal() {
+        this.setState({modalIsOpen: false});
+      }
 
     handleChange(event) {
         this.setState({value: event.target.value});
@@ -258,7 +279,7 @@ createNewPlaylist(id, playlistname)	{
   //console.log("left createNewPlaylist");
 }
 
-	search(q) {
+	/*search(q) {
 		spotifyApi.search(q, 'track')
 		.then((response) => {
 			this.setState( {
@@ -268,7 +289,7 @@ createNewPlaylist(id, playlistname)	{
 		var list = this.state.results.map((results) =>
 			<li>{this.state.results.name}</li>
 		);
-	}
+	}*/
 	
 	getTrack(traId) {
 		spotifyApi.getTrack(traId)
@@ -325,83 +346,128 @@ createNewPlaylist(id, playlistname)	{
 					snId: response.snapshot_id
 				});
 			})
-	}
-	
+  }
+  searchHelper(error,value){
+    console.log("in search helper");
+    //console.log("search results: " + items);
+    var i =0;
+    console.log("error: " + error);
+    console.log("value: " + typeof value);
+    console.log("total: " + value.href);
+    for(i=0; i<value.total; i++) {
+      searchTracks.push(value.items[i].track); //name of the track
+      console.log("track: " + tracks[i]);
+      //console.log("track " + i + value.items[i].track.name);
+    }  //
+    //var i = items;
+    listSearchTracks = searchTracks.map((searchTracks) =>
+      <li><button style = {{width: 25, height: 25, borderWidth: 3, fontSize: 15, backgroundColor: '#FF0000'}}>-</button>{i.name}</li>
+    );
+    this.openModal();
+  }
+
+  search() {
+    console.log("in search");
+    var x = document.getElementById("searcht");
+    var query = '';
+    query = x.elements[0].value;
+    console.log("query: " + query);
+    var token = this.getUrlParams2("access_token");
+    spotifyApi.setAccessToken(token);
+	//	var token = this.getUrlParams2("access_token");
+        /*fetch('https://api.spotify.com/v1/search?q={query}&type=track}', {headers: {'Authorization':'Bearer ' + token}})
+            .then(response => response.json())
+            .then(data => this.searchHelper(data.items));
+        spotifyApi.setAccessToken(token);*/
+        
+        /*fetch('https://api.spotify.com/v1/search', {headers: {'Authorization':'Bearer ' + token}})
+            .then(response => response.json())
+            .then(data => spotifyApi.searchTracks('Mr. Brightside', this.searchHelper));*/
+  /*spotifyApi.searchTracks('Love')
+  .then(function(data) {
+    console.log('Search by "Love"', data);
+  }, function(err) {
+    console.error(err);
+  });*/
+    spotifyApi.searchTracks(query, this.searchHelper);
+    console.log("leaving search");
+}
+  
+
 
     // Display our data
     render() {
       //mainid = this.props.id;
-      //console.log("im in render: " + mainid);
+      console.log("im in render: ");
         return (
-          <div className="App">
+          <div id="app" className="App">
             <h1 class="cover-heading">DJFY</h1>
             <div class="row">
-              <div class="col-sm-6">
-                <div class ="row">
-                  <div class="col-lg-6">
-                  </div>
-                  <div class="col-lg-6">
-                    Spotify Account: {this.state.spotifyAccount.accountName}
-                    <img  src={this.state.spotifyAccount.accountPic} style={{ height: 100 }}/>
-                    {/*user id: {this.state.spotifyAccount.Id}*/}
-                    <br /> <br /> {/* Show button to check spotify account */}
+              {/*<Modal
+                isOpen={this.state.modalIsOpen}
+                onAfterOpen={this.afterOpenModal}
+                onRequestClose={this.closeModal}
+                /*style={customStyles}
+                contentLabel="Example Modal">
+
+                <h2 ref={subtitle => this.subtitle = subtitle}>Hello</h2>
+                {listSearchTracks} {console.log("search listed")}
+                <button onClick={this.closeModal}>close</button>
+                <div>I am a modal</div>
+                <form>
+                  <input />
+                  <button>tab navigation</button>
+                  <button>stays</button>
+                  <button>inside</button>
+                  <button>the modal</button>
+                </form>
+              </Modal>*/}
+              <div class="create col-sm-12">
+                Spotify Account: {this.state.spotifyAccount.accountName}
+                <img  src={this.state.spotifyAccount.accountPic} style={{ height: 100 }}/>
+                {/*user id: {this.state.spotifyAccount.Id}*/}
+                <br /> <br /> {/* Show button to check spotify account */}
                   {
-                    this.state.loggedIn &&
-                    <button class="btn btn-sm btn-primary" onClick={() => this.getConnectedAccount()}>
-                        ShowAccount
-                    </button>
+                this.state.loggedIn &&
+                <button class="btn btn-sm btn-primary" onClick={() => this.getConnectedAccount()}>
+                    ShowAccount
+                </button>
                   }
-                    <p>Connect to Spotify &nbsp;</p>
-                    <a href="http://localhost:8888" class="btn btn-lg btn-secondary">Connect</a>
-                    <form id="createroom">
-                          <p class="lead">
-                            <a>NAME PLAYLIST:</a>
-                          </p>
-                          <input  type = 'text' onChange={this.handleChange} />
-                          <br/>
-                    </form> 
-                    <p class="lead">
-                          <a id="YOUR_ID" onClick={() => this.createRoom()} class="btn btn-lg btn-secondary">CREATE ROOM</a>
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/*<div class="col-sm-6">
-                <div class ="row">
-                  <div class="col-lg-6">
-
-                    <form id="joinroom"> 
+                <p>Connect to Spotify &nbsp;</p>
+                <a href="http://localhost:8888" class="btn btn-lg btn-secondary">Connect</a>
+                <form id="createroom">
                       <p class="lead">
-                        <a>ROOM CODE:</a>
+                        <a>NAME PLAYLIST:</a>
                       </p>
-                      <input type="text" name="roomcode" onChange={this.handleChange} />
+                      <input  type = 'text' onChange={this.handleChange} />
                       <br/>
-                    </form>
-
-                    Join Room
-                    <button class="btn btn-lg btn-secondary" onClick={() => this.joinRoom()}>Join</button>
-                  </div>
-                  <div class="col-lg-6">
-                  </div>
-                </div>
-              </div>*/}
+                </form> 
+                <p class="lead">
+                  {/*<a id="YOUR_ID" className={this.state.isCreated ? 'box focused' : 'box'}  onClick={() => this.createRoom()} class="btn btn-lg btn-secondary">{React.cloneElement(document.getElementById('app'), {
+                    onClick: _ => this.setState({isCreated: true}),})}CREATE ROOM</a>*/}
+                </p>
+              </div>
             </div> {/* Closing div for first row */}
-            
-            <ul align = "left">
-            <h2>{this.state.playlistName} - {this.state.roomCode}</h2>
-            <form onSubmit={this.handleSearch}>
-              <label>
-                Search:
-                <input  type = 'text' onChange={this.handleChange} />
-              </label>
-              <input type="submit" value="Search" />
-            </form>
-              
-                  <br/> <br/>
-                  {listTracks} {console.log("listed")}
-            </ul> 
+            <div class="row">
+              <div class="room col-sm-12">
+                <ul align = "left">
+                <h2>{this.state.playlistName}</h2>
+                <form id ="searcht">
+                  <label>
+                    Search:
+                    <input  type = 'text' />
+                  </label>
+                  {/*<input onClick={() => this.search} value="Search" />*/}
 
+                </form>
+                <p class="lead">
+                  <a id="" onClick={() => this.search()} class="btn btn-lg btn-secondary">SEARCH</a>
+                </p>
+                      <br/> <br/>
+                      {listTracks} {console.log("listed")}
+                </ul> 
+              </div>
+            </div>
           </div>
         );
     }
